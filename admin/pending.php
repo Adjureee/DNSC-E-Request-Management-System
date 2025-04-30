@@ -38,6 +38,7 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
     }
     .nav-link {
       color: rgba(255,255,255,.8);
+      position: relative;
     }
     .nav-link:hover {
       color: white;
@@ -58,24 +59,11 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
       background-color: #146c43;
       border-color: #146c43;
     }
-    .sidebar .nav-link {
-    position: relative;
-}
 
-.sidebar .badge {
-    position: absolute;
-    top: 5px; 
-    right: 15px; 
-    background-color: red;
-    color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 50%;
-}
 .badge-notification {
             position: absolute;
             top: 5px;
-            right: 15px;
+            right: 20px;
             background-color: red;
             color: white;
             font-size: 0.6rem;
