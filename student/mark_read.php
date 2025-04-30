@@ -9,6 +9,7 @@ $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?")
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 
+
 // Return success response for AJAX call
 header('Content-Type: application/json');
 echo json_encode(['success' => true]);

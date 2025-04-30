@@ -240,6 +240,22 @@ $request = $result->fetch_assoc();
                                     <div class="col-md-8"><?php echo htmlspecialchars($request['full_name']); ?></div>
                                 </div>
                                 <div class="row mb-3">
+                                    <div class="col-md-4 fw-bold">Institute:</div>
+                                    <div class="col-md-8"><?php echo htmlspecialchars($request['institute']); ?></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 fw-bold">Program:</div>
+                                    <div class="col-md-8"><?php echo htmlspecialchars($request['program']); ?></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 fw-bold">Year Level:</div>
+                                    <div class="col-md-8"><?php echo htmlspecialchars($request['year_level']); ?></div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4 fw-bold">Semester:</div>
+                                    <div class="col-md-8"><?php echo htmlspecialchars($request['semester']); ?></div>
+                                </div>
+                                <div class="row mb-3">
                                     <div class="col-md-4 fw-bold">Student Email:</div>
                                     <div class="col-md-8"><?php echo htmlspecialchars($request['email']); ?></div>
                                 </div>
