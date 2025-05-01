@@ -166,15 +166,19 @@ if (!in_array($request['status'], ['approved', 'completed'])) {
         /* Vision, Mission, Core Values Footer */
         .vision-mission-footer {
             margin-top: 30px;
+            margin-left: -25px;
+            margin-right: -25px;
+            padding-left: 25px; 
             display: flex;
             background-color: #006400;
             color: white;
             font-family: 'Century Gothic', 'CenturyGothic', Arial, sans-serif;
             font-size: 11px;
             position: relative;
-            width: 100%;
+            width: calc(100% + 50px);
             overflow: hidden;
             min-height: 90px;
+            box-sizing: border-box;
         }
         
         .vision-section {
@@ -228,8 +232,8 @@ if (!in_array($request['status'], ['approved', 'completed'])) {
         .footer-logo {
             height: 50px;
             margin: 0 5px;
-            background-color: transparent;
-            padding: 3px;
+            background-color: white;
+            padding: 5px;
         }
         
         @media print {
@@ -249,6 +253,12 @@ if (!in_array($request['status'], ['approved', 'completed'])) {
                 padding: 15px 25px;
                 box-shadow: none;
                 page-break-after: always;
+            }
+            .vision-mission-footer {
+                margin-left: 0;
+                margin-right: 0;
+                width: 100%;
+                padding-left: 0;
             }
         }
     </style>
