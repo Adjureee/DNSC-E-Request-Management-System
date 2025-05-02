@@ -11,61 +11,81 @@ $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
-    
+
     if ($action === 'approve') {
         $tracking_number = 'TR-' . date('Ymd') . '-' . $id . rand(1000, 9999);
         $pickup_datetime = $_POST['pickup_datetime'];
-        
+
         $stmt = $conn->prepare("UPDATE requests SET status = 'approved', tracking_number = ?, pickup_datetime = ? WHERE id = ?");
         $stmt->bind_param("ssi", $tracking_number, $pickup_datetime, $id);
-        
+
         if ($stmt->execute()) {
             $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
             $user_id = $request['user_id'];
             $notification_message = "Your request (ID: $id) has been approved. Your tracking number is $tracking_number. Please pick up your document on $pickup_datetime.";
-            
+
             $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
             $stmt->bind_param("is", $user_id, $notification_message);
             $stmt->execute();
-            
+
             $message = "Request has been approved successfully.";
         } else {
             $message = "Error updating request: " . $conn->error;
         }
+
     } elseif ($action === 'reject') {
         $reason = $_POST['rejection_reason'] ?? '';
         $stmt = $conn->prepare("UPDATE requests SET status = 'rejected' WHERE id = ?");
         $stmt->bind_param("i", $id);
-        
+
         if ($stmt->execute()) {
             $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
             $user_id = $request['user_id'];
             $notification_message = "Your request (ID: $id) has been rejected. $reason Please contact the registrar for more information.";
-            
+
             $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
             $stmt->bind_param("is", $user_id, $notification_message);
             $stmt->execute();
-            
-            $message = "has been rejected. Please contact the registrar for more information.";
+
+            $message = "Request has been rejected. Please contact the registrar for more information.";
         } else {
             $message = "Error updating request: " . $conn->error;
         }
+
     } elseif ($action === 'complete') {
         $stmt = $conn->prepare("UPDATE requests SET status = 'completed' WHERE id = ?");
         $stmt->bind_param("i", $id);
-        
+
         if ($stmt->execute()) {
             $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
             $user_id = $request['user_id'];
             $notification_message = "Your request (ID: $id) has been completed and is ready for pickup.";
-            
+
             $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
             $stmt->bind_param("is", $user_id, $notification_message);
             $stmt->execute();
-            
+
             $message = "Request has been marked as completed.";
         } else {
             $message = "Error updating request: " . $conn->error;
+        }
+
+    } elseif ($action === 'send_additional_note') {
+        $additional_note = trim($_POST['additional_note']);
+        if (!empty($additional_note)) {
+            $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
+            $user_id = $request['user_id'];
+            $notification_message = "Update regarding your approved request (ID: $id): $additional_note";
+
+            $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
+            $stmt->bind_param("is", $user_id, $notification_message);
+            if ($stmt->execute()) {
+                $message = "Additional update sent to the user.";
+            } else {
+                $message = "Error sending update: " . $conn->error;
+            }
+        } else {
+            $message = "Notification message cannot be empty.";
         }
     }
 }
@@ -147,7 +167,6 @@ $request = $result->fetch_assoc();
                     <div class="card request-details-card mb-4">
                         <div class="card-header"><h5 class="mb-0">Request #<?php echo $id; ?></h5></div>
                         <div class="card-body">
-                            
                             <?php
                             $statusClass = match ($request['status']) {
                                 'pending' => 'warning',
@@ -180,27 +199,39 @@ $request = $result->fetch_assoc();
                         <div class="card-header"><h5 class="mb-0">Actions</h5></div>
                         <div class="card-body">
                             <?php if ($request['status'] === 'pending'): ?>
-                            <form method="POST" action="" class="mb-3">
-                                <h6>Approve Request</h6>
-                                <div class="mb-3">
-                                    <label class="form-label">Set Pickup Date/Time</label>
-                                    <input type="datetime-local" name="pickup_datetime" class="form-control" required>
-                                </div>
-                                <input type="hidden" name="action" value="approve">
-                                <button type="submit" class="btn btn-success"><i class="fas fa-check-circle me-1"></i> Approve Request</button>
-                            </form>
+                                <!-- Approve form -->
+                                <form method="POST" action="" class="mb-3">
+                                    <h6>Approve Request</h6>
+                                    <div class="mb-3">
+                                        <label class="form-label">Set Pickup Date/Time</label>
+                                        <input type="datetime-local" name="pickup_datetime" class="form-control" required>
+                                    </div>
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="btn btn-success"><i class="fas fa-check-circle me-1"></i> Approve Request</button>
+                                </form>
+                                <hr>
+                                <h6>Reject Request</h6>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="fas fa-times-circle me-1"></i> Reject Request</button>
 
-                            <hr>
-
-                            <h6>Reject Request</h6>
-                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="fas fa-times-circle me-1"></i> Reject Request</button>
                             <?php elseif ($request['status'] === 'approved'): ?>
-                            <form method="POST" action="">
-                                <input type="hidden" name="action" value="complete">
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-check-double me-1"></i> Mark as Completed</button>
-                            </form>
+                                <!-- Additional notification form -->
+                                <form method="POST" action="" class="mb-3">
+                                    <h6>Send Additional Notification</h6>
+                                    <div class="mb-3">
+                                        <textarea name="additional_note" class="form-control" rows="3" placeholder="Type additional update for the user..."></textarea>
+                                    </div>
+                                    <input type="hidden" name="action" value="send_additional_note">
+                                    <button type="submit" class="btn btn-warning"><i class="fas fa-paper-plane me-1"></i> Send Update</button>
+                                </form>
+
+                                <!-- Complete request form -->
+                                <form method="POST" action="">
+                                    <input type="hidden" name="action" value="complete">
+                                    <button type="submit" class="btn btn-primary"><i class="fas fa-check-double me-1"></i> Mark as Completed</button>
+                                </form>
+
                             <?php else: ?>
-                            <p class="text-muted">No actions available for this request status.</p>
+                                <p class="text-muted">No actions available for this request status.</p>
                             <?php endif; ?>
                         </div>
                     </div>
