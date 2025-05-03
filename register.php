@@ -153,48 +153,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+         :root {
+            --primary: #2d5516;
+            --secondary: #C1D95C;
+            --tertiary: #498428;
+         }
         body {
-            background-color: #f8f9fa;
+            background: linear-gradient(to right, #C1D95C, #498428);  
         }
         .register-container {
             max-width: 550px;
-            margin: 50px auto;
+            margin: 25px auto ;
         }
         .card {
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px #000000;
         }
         .card-header {
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
             border-radius: 10px 10px 0 0 !important;
         }
         .btn-primary {
             width: 100%;
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-success {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-success:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         a {
-            color: #198754;
+            color: #2d5516;
         }
         a:hover {
-            color: #146c43;
+            color: #2d5516;
         }
         .form-control:focus {
-            border-color: #198754;
-            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+            border-color: #2d5516;
+            box-shadow: 0 0 0 0.25rem #198754;
         }
         .loading {
             display: none;
@@ -212,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card-header text-center py-3">
                 <h4>Register for DNSC E-Request System</h4>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-8">
                 <?php if ($error): ?>
                     <div class="alert alert-danger">
                         <?php echo $error; ?>
@@ -229,6 +234,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php else: ?>
                 
                 <form id="registerForm" method="POST" action="" novalidate>
+            
+<!-- wala pa na implement --> 
+<div class="mb-3">
+                <label for="Account-type" class="form-label">Account Type</label>
+                <select class="form-select" id="Account-type" name="account-type" required>
+                    <option value="">-- Select Role --</option>
+                    <option value="students">Student</option>
+                    <option value="faculty">Faculty</option>
+                    <option value="alumni">Alumni</option>
+                </select>
+            </div>
+
+            <!-- Students Input -->
+            <div class="mb-3" id="studentsInputWrapper" style="display: none;">
+                <label for="students-role" class="form-label">Enter your Student ID</label>
+                <input type="text" class="form-control" id="students-role" name="students-role" placeholder="Enter your Student ID" required>
+            </div>
+
+            <!-- Faculty Input -->
+            <div class="mb-3" id="facultyInputWrapper" style="display: none;">
+                <label for="faculty-role" class="form-label">Enter your Faculty ID</label>
+                <input type="text" class="form-control" id="faculty-role" name="faculty-role" placeholder="Enter your Faculty ID" required>
+            </div>
+
+            <!-- Alumni Input -->
+            <div class="mb-3" id="alumniInputWrapper" style="display: none;">
+                <label for="alumni-role" class="form-label">Enter your Alumni ID</label>
+                <input type="text" class="form-control" id="alumni-role" name="alumni-role" placeholder="Enter your Alumni ID" required>
+            </div>
+
+            <!-- Authorized Guest Input -->
+            <script>
+                const roleSelect = document.getElementById('Account-type');
+                const inputSections = {
+                    students: document.getElementById('studentsInputWrapper'),
+                    faculty: document.getElementById('facultyInputWrapper'),
+                    alumni: document.getElementById('alumniInputWrapper'),
+                };
+                roleSelect.addEventListener('change', function () {
+                    const selected = this.value;
+                    for (const key in inputSections) {
+                        inputSections[key].style.display = (key === selected) ? 'block' : 'none';
+                    }
+                });
+            </script>
+<!-- wala pa na implement -->
+
                     <div class="mb-3">
                         <label for="full_name" class="form-label">Full Name</label>
                         <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($formData['full_name']); ?>" required>
