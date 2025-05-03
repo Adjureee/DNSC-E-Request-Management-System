@@ -114,32 +114,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select class="form-select" id="Account-type" name="account-type" required>
                     <option value="">-- Select Role --</option>
                     <option value="students">Student</option>
-                    <option value="faculty">Faculty</option>
                     <option value="alumni">Alumni</option>
                 </select>
             </div>
 
             <!-- Students Input -->
             <div class="mb-3" id="studentsInputWrapper" style="display: none;">
-                <label for="students-role" class="form-label">Enter your Student ID</label>
+                <label for="students-role" class="form-label">Identification Number:</label>
                 <input type="text" class="form-control" id="students-role" name="students-role" placeholder="Enter your Student ID" required>
-            </div>
-            <!-- Faculty Input -->
-            <div class="mb-3" id="facultyInputWrapper" style="display: none;">
-                <label for="faculty-role" class="form-label">Enter your Faculty ID</label>
-                <input type="text" class="form-control" id="faculty-role" name="faculty-role" placeholder="Enter your Faculty ID" required>
             </div>
             <!-- Alumni Input -->
             <div class="mb-3" id="alumniInputWrapper" style="display: none;">
-                <label for="alumni-role" class="form-label">Enter your Alumni ID</label>
+                <label for="alumni-role" class="form-label">Identification Number:</label>
                 <input type="text" class="form-control" id="alumni-role" name="alumni-role" placeholder="Enter your Alumni ID" required>
             </div>
-            <!-- Authorized Guest Input -->
+
             <script>
                 const roleSelect = document.getElementById('Account-type');
                 const inputSections = {
                     students: document.getElementById('studentsInputWrapper'),
-                    faculty: document.getElementById('facultyInputWrapper'),
                     alumni: document.getElementById('alumniInputWrapper'),
                 };
                 roleSelect.addEventListener('change', function () {
