@@ -340,7 +340,49 @@ if (isset($_SESSION['user_id'])) {
                     </a>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-                    <img src="assets/img/DNSC_thumbnail.png" alt="E-Request System" class="img-fluid rounded-lg shadow-lg" style="transform: perspective(1000px) rotateY(-10deg); max-width: 90%;">
+                    <!-- Carousel implementation -->
+                    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                        <!-- Carousel indicators -->
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        </div>
+                        
+                        <!-- Carousel items -->
+                        <div class="carousel-inner rounded-lg shadow-lg">
+                            <div class="carousel-item active">
+                                <img src="assets/img/DNSC_thumbnail.png" class="d-block w-100" alt="E-Request System">
+                                <div class="carousel-caption d-none d-md-block">
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="assets/img/campus.jpg" class="d-block w-100" alt="DNSC Campus">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>DNSC Campus</h5>
+                                    <p>Nurturing excellence in education</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="assets/img/students.jpg" class="d-block w-100" alt="DNSC Students">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Our Students</h5>
+                                    <p>The future of tomorrow</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Carousel controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <!-- End of carousel -->
                 </div>
             </div>
         </div>
@@ -610,7 +652,7 @@ if (isset($_SESSION['user_id'])) {
                     <p class="mb-0">&copy; <?php echo date('Y'); ?> DNSC E-Request Management System. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
-                    <p class="mb-0">Designed with <i class="fas fa-heart text-danger"></i> by Chanchan and Arjean</p>
+                    <p class="mb-0">Designed by Chanchan <i class="fas fa-heart text-danger"></i> Arjean</p>
                 </div>
             </div>
         </div>
