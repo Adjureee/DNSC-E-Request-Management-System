@@ -235,42 +235,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 <form id="registerForm" method="POST" action="" novalidate>
             
-<!-- wala pa na implement --> 
-            <div class="mb-3">
-                <label for="Account-type" class="form-label">Account Type</label>
-                <select class="form-select" id="Account-type" name="account-type" required>
-                    <option value="">-- Select Role --</option>
-                    <option value="students">Student</option>
-                    <option value="alumni">Alumni</option>
-                </select>
-            </div>
-
-              <!-- Students Input -->
-              <div class="mb-3" id="studentsInputWrapper" style="display: none;">
-                <label for="students-role" class="form-label">Identification Number:</label>
-                <input type="text" class="form-control" id="students-role" name="students-role" placeholder="Enter your Student ID" required>
-            </div>
-            <!-- Alumni Input -->
-            <div class="mb-3" id="alumniInputWrapper" style="display: none;">
-                <label for="alumni-role" class="form-label">Identification Number:</label>
-                <input type="text" class="form-control" id="alumni-role" name="alumni-role" placeholder="Enter your Alumni ID" required>
-            </div>
-        
-            <script>
-                const roleSelect = document.getElementById('Account-type');
-                const inputSections = {
-                    students: document.getElementById('studentsInputWrapper'),
-                    alumni: document.getElementById('alumniInputWrapper'),
-                };
-                roleSelect.addEventListener('change', function () {
-                    const selected = this.value;
-                    for (const key in inputSections) {
-                        inputSections[key].style.display = (key === selected) ? 'block' : 'none';
-                    }
-                });
-            </script>
-<!-- wala pa na implement -->
-
                     <div class="mb-3">
                         <label for="full_name" class="form-label">Full Name</label>
                         <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($formData['full_name']); ?>" required>
