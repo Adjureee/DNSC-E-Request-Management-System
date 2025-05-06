@@ -181,9 +181,10 @@ $latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
 
             <!-- Main content -->
             <main class="col-12 px-md-4 py-4" id="main-content">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2 mb-0">Admin Dashboard</h1>
-                </div>
+            <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="display-7">Admin Dashboard</h1>
+            </div>
+            </main>
 
                 <!-- Stats Cards -->
                 <div class="row my-4">

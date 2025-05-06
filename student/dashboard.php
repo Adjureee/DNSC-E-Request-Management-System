@@ -220,10 +220,11 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <!-- Main content -->
-            <main class="col-12 px-md-4 py-4" id="mainContent">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Student Dashboard</h1>
-                </div>
+            <main class="col-12 px-md-4 py-4" id="main-content">
+            <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="display-7">Student Dashboard</h1>
+            </div>
+            </main>
 
                 <!-- Notifications -->
                 <?php if (count($notifications) > 0): ?>

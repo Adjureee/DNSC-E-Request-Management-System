@@ -97,6 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
             background-color: #f1fdf6;
             border-left: 5px solid #2d5516;
         }
+       
     </style>
 </head>
 <body>

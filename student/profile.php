@@ -18,17 +18,86 @@ $user = $stmt->get_result()->fetch_assoc();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - DNSC E-Request System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2d5516;
+            --secondary: #C1D95C;
+            --tertiary: #498428;
+        }
+
+        body {
+            background-color: var(--secondary);
+        }
+
+        .profile-container {
+            min-height: 100vh;
+        }
+
+        .profile-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            background-color: #fff;
+        }
+
+        .profile-header {
+            background-color: var(--primary);
+            color: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .profile-header i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .profile-body {
+            padding: 30px;
+        }
+
+        .profile-body p {
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .label-title {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .btn-dashboard {
+            background-color: var(--tertiary);
+            border-color: var(--tertiary);
+        }
+
+        .btn-dashboard:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            color: #000;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1>Profile</h1>
-        <div class="card">
-            <div class="card-body">
-                <p><strong>Full Name:</strong> <?php echo htmlspecialchars($user['full_name']); ?></p>
-                <p><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
-                <p><strong>Member Since:</strong> <?php echo date('M d, Y', strtotime($user['created_at'])); ?></p>
-                <a href="dashboard.php" class="btn btn-primary">Back to Dashboard</a>
+    <div class="container d-flex justify-content-center align-items-center profile-container">
+        <div class="profile-card w-100" style="max-width: 500px;">
+            <div class="profile-header">
+                <i class="fas fa-user-circle"></i>
+                <h3>Student Profile</h3>
             </div>
+                <div class="profile-body">
+                    <table class="table table-bordered">
+                        <tr><th>Full Name</th><td><?= htmlspecialchars($user['full_name']) ?></td></tr>
+                        <tr><th>Email</th><td><?= htmlspecialchars($user['email']) ?></td></tr>
+                        <tr><th>Member Since</th><td><?= date('M d, Y', strtotime($user['created_at'])) ?></td></tr>
+                    </table>
+                    <div class="text-center mt-3">
+                        <a href="dashboard.php" class="btn btn-dashboard px-4">← Back to Dashboard</a>
+                    </div>
+                </div>
         </div>
     </div>
 </body>
