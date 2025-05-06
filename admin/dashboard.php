@@ -184,7 +184,7 @@ $latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
             <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="display-7">Admin Dashboard</h1>
             </div>
-            </main>
+            
 
                 <!-- Stats Cards -->
                 <div class="row my-4">

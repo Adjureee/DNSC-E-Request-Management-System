@@ -153,9 +153,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+         :root {
+            --primary: #2d5516;
+            --secondary: #C1D95C;
+            --tertiary: #498428;
+        }
         body {
-            background-color: #f8f9fa;
-            background: linear-gradient(to left,#336A29,#283618);
+            background: linear-gradient(to right, #C1D95C, #498428);      
         }
         .register-container {
             max-width: 550px;

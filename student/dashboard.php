@@ -96,6 +96,16 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             border-color: #badbcc;
             color: #498428;
         }
+        /* Adjust layout when sidebar is hidden */
+        .sidebar-collapsed #sidebarMenu {
+            display: none;
+        }
+
+        .sidebar-collapsed #main-content {
+            margin-left: 0 !important;
+            width: 100%;
+        }
+
         /* #sidebarToggle {
             position: fixed;
             top: 15px;
@@ -224,7 +234,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="display-7">Student Dashboard</h1>
             </div>
-            </main>
+           
 
                 <!-- Notifications -->
                 <?php if (count($notifications) > 0): ?>
@@ -382,19 +392,19 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
     <script>
     document.getElementById('sidebarToggleTop').addEventListener('click', function () {
-        var sidebar = document.getElementById('sidebarMenu');
-        var main = document.getElementById('mainContent');
+    var sidebar = document.getElementById('sidebarMenu');
+    var main = document.getElementById('main-content'); // <-- corrected ID
 
-        sidebar.classList.toggle('show');
+    sidebar.classList.toggle('show');
 
-        if (sidebar.classList.contains('show')) {
-            main.classList.remove('col-12');
-            main.classList.add('col-md-9', 'col-lg-10');
-        } else {
-            main.classList.remove('col-md-9', 'col-lg-10');
-            main.classList.add('col-12');
-        }
-    });
+    if (sidebar.classList.contains('show')) {
+        main.classList.remove('col-12');
+        main.classList.add('col-md-9', 'col-lg-10');
+    } else {
+        main.classList.remove('col-md-9', 'col-lg-10');
+        main.classList.add('col-12');
+    }
+});
 </script>
 
 
