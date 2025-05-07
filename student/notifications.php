@@ -69,7 +69,7 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
         }
         .nav-link {
@@ -92,8 +92,8 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
             border-radius: 50%;
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-primary:hover {
             background-color: #146c43;
@@ -108,6 +108,15 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
             border-color: #198754;
             color: white;
         }
+        /* .btn-outline-custom{
+            color: #2d5516;
+            border: 1px solid #2d5516;
+            background-color: transparent;
+        } 
+        .btn-outline-custom :hover{
+            background-color: #2d5516;
+            color: #2d5516;
+        } */
         .alert-info {
             background-color: #d1e7dd;
             border-color: #badbcc;
@@ -119,11 +128,11 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-success text-white">
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse text-white">
             <div class="position-sticky pt-3">
                 <div class="text-center mb-4">
                     <h5>DNSC E-Request System</h5>
-                    <p class="text-muted">Student Portal</p>
+                    <p class="text-light">Student Portal</p>
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item"><a class="nav-link text-white" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
@@ -137,7 +146,7 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li class="nav-item mt-5"><a class="nav-link text-white" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                    <!-- Logout removed from sidebar -->
                 </ul>
             </div>
         </div>

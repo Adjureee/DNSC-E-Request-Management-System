@@ -26,7 +26,7 @@ $completedRequests = $result->fetch_all(MYSQLI_ASSOC);
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
         }
         .nav-link {
@@ -44,12 +44,12 @@ $completedRequests = $result->fetch_all(MYSQLI_ASSOC);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #498428;
+            border-color: #498428;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
     </style>
 </head>
@@ -61,7 +61,7 @@ $completedRequests = $result->fetch_all(MYSQLI_ASSOC);
             <div class="position-sticky pt-3">
                 <div class="text-center mb-4">
                     <h5>DNSC E-Request System</h5>
-                    <p class="text-muted">Admin Panel</p>
+                    <p class="text-white">Admin Panel</p>
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -94,12 +94,12 @@ $completedRequests = $result->fetch_all(MYSQLI_ASSOC);
                             Completed Requests
                         </a>
                     </li>
-                    <li class="nav-item mt-5">
+                    <!-- <li class="nav-item mt-5">
                         <a class="nav-link" href="../logout.php">
                             <i class="fas fa-sign-out-alt me-2"></i>
                             Logout
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>

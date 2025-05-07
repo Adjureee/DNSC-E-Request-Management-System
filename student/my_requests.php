@@ -38,7 +38,7 @@ $total_pages = ceil($total_records / $limit);
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
         }
         .nav-link {
@@ -56,28 +56,28 @@ $total_pages = ceil($total_records / $limit);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #498428;
+            border-color: #498428;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-success {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #498428;
+            border-color: #498428;
         }
         .btn-success:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-outline-primary {
-            color: #198754;
-            border-color: #198754;
+            color: #498428;
+            border-color: #498428;
         }
         .btn-outline-primary:hover {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #2d5516;
+            border-color: #2d5516;
             color: white;
         }
         .card-header {
@@ -85,7 +85,7 @@ $total_pages = ceil($total_records / $limit);
             border-bottom: 1px solid #d1e7dd;
         }
         .page-link {
-            color: #198754;
+            color: #498428;
         }
         .page-item.active .page-link {
             background-color: #198754;
@@ -101,7 +101,7 @@ $total_pages = ceil($total_records / $limit);
                 <div class="position-sticky pt-3">
                     <div class="text-center mb-4">
                         <h5>DNSC E-Request System</h5>
-                        <p class="text-muted">Student Portal</p>
+                        <p class="text-light">Student Portal</p>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -127,13 +127,8 @@ $total_pages = ceil($total_records / $limit);
                                 <i class="fas fa-bell me-2"></i>
                                 Notifications
                             </a>
-                        </li>
-                        <li class="nav-item mt-5">
-                            <a class="nav-link" href="../logout.php">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                Logout
-                            </a>
-                        </li>
+                        </li> 
+                    
                     </ul>
                 </div>
             </div>

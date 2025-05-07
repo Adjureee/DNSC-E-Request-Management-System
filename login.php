@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         body {
             background-color: #f8f9fa;
+            /* background: linear-gradient(to right,#336A29,#283618); */
         }
         .login-container {
             max-width: 450px;
@@ -82,24 +83,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .card-header {
-            background-color: #198754;
+            background-color: #336A29;
             color: white;
             border-radius: 10px 10px 0 0 !important;
         }
         .btn-primary {
             width: 100%;
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #336A29;
+            border-color: #336A29;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #283618;
+            border-color: #283618;
         }
         a {
-            color: #198754;
+            color: #DDA15E;
         }
         a:hover {
-            color: #146c43;
+            color: #BC6C25 ;
         }
     </style>
 </head>

@@ -32,7 +32,7 @@ $request = $result->fetch_assoc();
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
         }
         .nav-link {
@@ -81,20 +81,20 @@ $request = $result->fetch_assoc();
             z-index: 2;
         }
         .timeline-item.active:before {
-            background: #198754;
-            border-color: #198754;
+            background: #2d5516;
+            border-color: #2d5516;
         }
         .timeline-item.completed:before {
-            background: #198754;
-            border-color: #198754;
+            background: #2d5516;
+            border-color: #2d5516;
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #498428;
+            border-color: #498428;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .card-header {
             background-color: #e9f7ef;
@@ -110,7 +110,7 @@ $request = $result->fetch_assoc();
                 <div class="position-sticky pt-3">
                     <div class="text-center mb-4">
                         <h5>DNSC E-Request System</h5>
-                        <p class="text-muted">Student Portal</p>
+                        <p class="text-white">Student Portal</p>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -137,12 +137,7 @@ $request = $result->fetch_assoc();
                                 Notifications
                             </a>
                         </li>
-                        <li class="nav-item mt-5">
-                            <a class="nav-link" href="../logout.php">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                Logout
-                            </a>
-                        </li>
+                        <!-- Logout removed from sidebar -->
                     </ul>
                 </div>
             </div>

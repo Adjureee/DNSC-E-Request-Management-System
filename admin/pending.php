@@ -33,12 +33,11 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
   <style>
     .sidebar {
       min-height: 100vh;
-      background-color: #198754;
+      background-color: #2d5516;
       color: white;
     }
     .nav-link {
       color: rgba(255,255,255,.8);
-      position: relative;
     }
     .nav-link:hover {
       color: white;
@@ -52,18 +51,31 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     .btn-primary {
-      background-color: #198754;
-      border-color: #198754;
+      background-color: #498428;
+      border-color: #498428;
     }
     .btn-primary:hover {
-      background-color: #146c43;
-      border-color: #146c43;
+      background-color: #2d5516;
+      border-color: #2d5516;
     }
+    .sidebar .nav-link {
+    position: relative;
+}
 
+.sidebar .badge {
+    position: absolute;
+    top: 5px; 
+    right: 15px; 
+    background-color: red;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
 .badge-notification {
             position: absolute;
             top: 5px;
-            right: 20px;
+            right: 15px;
             background-color: red;
             color: white;
             font-size: 0.6rem;
@@ -81,7 +93,7 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
       <div class="position-sticky pt-3">
         <div class="text-center mb-4">
           <h5>DNSC E-Request System</h5>
-          <p class="text-muted">Admin Panel</p>
+          <p class="text-white">Admin Panel</p>
         </div>
         <ul class="nav flex-column">
           <li class="nav-item">
@@ -117,12 +129,12 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
               Completed Requests
             </a>
           </li>
-          <li class="nav-item mt-5">
+          <!-- <li class="nav-item mt-5">
             <a class="nav-link" href="../logout.php">
               <i class="fas fa-sign-out-alt me-2"></i>
               Logout
             </a>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>

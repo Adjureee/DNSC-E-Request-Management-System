@@ -8,7 +8,7 @@ if (isset($_SESSION['user_id'])) {
         exit;
     } else {
         header('Location: student/dashboard.php');
-        exit;
+        exit;   
     }
 }
 ?>
@@ -21,127 +21,412 @@ if (isset($_SESSION['user_id'])) {
     <title>DNSC E-Request Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
+            overflow-x: hidden;
         }
         
+        /* Improved Navbar Styling */
+        .navbar {
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+            padding: 15px 0;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, #2d5516 20%, #388e3c 100%) !important;
+        }
+        
+        .navbar.scrolled {
+            padding: 8px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            background: #2d5516 !important;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+        }
+        
+        .nav-item {
+            margin: 0 5px;
+            position: relative;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            padding: 10px 15px !important;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            color: white !important;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background-color: #fff;
+            bottom: 5px;
+            left: 15px;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after, .nav-link.active::after {
+            width: calc(100% - 30px);
+        }
+        
+        /* Improved Button Styling */
+        .navbar .btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .btn-success {
+            background-color: #498428;
+            border-color: #498428;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .navbar .btn-success:hover {
+            background-color: #549a2d;
+            border-color: #549a2d;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .navbar .btn-outline-light {
+            border-width: 2px;
+        }
+        
+        .navbar .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Mobile nav toggler */
+        .navbar-toggler {
+            border: none;
+            padding: 10px;
+            margin-right: 5px;
+            position: relative;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: none;
+            outline: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* For mobile */
+        @media (max-width: 991px) {
+            .navbar-collapse {
+                background-color: #2d5516;
+                padding: 15px;
+                border-radius: 10px;
+                margin-top: 10px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            }
+            
+            .nav-link::after {
+                display: none;
+            }
+            
+            .navbar .btn {
+                margin-top: 10px;
+                display: block;
+                width: 100%;
+            }
+        }
+        
+        /* Improved Hero Section */
         .hero-section {
-            background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+            background: linear-gradient(135deg, #2d5516 20%, #4caf50 100%);
             color: white;
-            padding: 80px 0;
-            border-radius: 0 0 20px 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 100px 0 80px;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('assets/img/pattern.png');
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
         }
         
         .hero-title {
-            font-weight: 700;
-            margin-bottom: 20px;
+            font-weight: 800;
+            margin-bottom: 25px;
+            font-size: 3rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
+        /* Enhanced Feature Cards */
         .feature-card {
-            border-radius: 10px;
+            border-radius: 15px;
             border: none;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.4s, box-shadow 0.4s;
             height: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
         
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
         }
         
         .feature-icon {
-            font-size: 2.5rem;
-            color: #198754;
-            margin-bottom: 15px;
+            font-size: 3rem;
+            color: #388e3c;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
         }
         
-        .login-card {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1);
         }
         
-        .btn-success {
-            background-color: #198754;
-            border-color: #198754;
-        }
-        
-        .btn-success:hover {
-            background-color: #146c43;
-            border-color: #146c43;
-        }
-        
-        .btn-outline-success {
-            color: #198754;
-            border-color: #198754;
-        }
-        
-        .btn-outline-success:hover {
-            background-color: #198754;
-            border-color: #198754;
-        }
-        
-        .footer {
-            background-color: #343a40;
-            color: rgba(255, 255, 255, 0.7);
-            padding: 20px 0;
-            margin-top: 80px;
-        }
-        
+        /* Team Section Improvements */
         .team-section {
-            padding: 60px 0;
-            background-color: #f8f9fa;
+            padding: 80px 0;
+            background-color: #f9fafb;
         }
         
         .team-card {
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.4s, box-shadow 0.4s;
             height: 100%;
+            overflow: hidden;
         }
         
         .team-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
         }
         
-        .card-img-top {
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            height: 200px;
-            object-fit: cover;
+        .team-card .rounded-circle {
+            transition: transform 0.3s;
+            border: 4px solid #f8f9fa;
         }
         
+        .team-card:hover .rounded-circle {
+            transform: scale(1.05);
+            border-color: #e8f5e9;
+        }
+        
+        /* How It Works Section */
+        .step-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 50px;
+            bottom: 0;
+            width: 2px;
+            background-color: #e0e0e0;
+        }
+        
+        .step-circle {
+            background-color: #388e3c;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(56, 142, 60, 0.3);
+        }
+        
+        /* Button Styling */
+        .btn-success {
+            background-color: #388e3c;
+            border-color: #388e3c;
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(56, 142, 60, 0.25);
+            transition: all 0.3s;
+        }
+        
+        .btn-success:hover {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+            box-shadow: 0 6px 15px rgba(46, 125, 50, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-light {
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            border-width: 2px;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline-light:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 60px;
+        }
+        
+        .section-header h2 {
+            font-weight: 800;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+        
+        .section-header h2::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: -10px;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: #388e3c;
+            border-radius: 10px;
+        }
+        
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 50px;
+            height: 50px;
+            background-color: #388e3c;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .back-to-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background-color: #2e7d32;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer Improvements */
+        .footer {
+            background-color: #263238;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 60px 0 30px;
+            margin-top: 80px;
+            border-top: 5px solid #388e3c;
+        }
+        
+        .footer a.text-white-50:hover {
+            color: white !important;
+            text-decoration: none;
+        }
+        
+        .social-icon {
+            transition: transform 0.3s;
+            display: inline-block;
+        }
+        
+        .social-icon:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* Responsive Adjustments */
         @media (max-width: 768px) {
             .hero-section {
-                padding: 50px 0;
+                padding: 70px 0 50px;
             }
             
             .hero-title {
-                font-size: 2rem;
+                font-size: 2.2rem;
+            }
+            
+            .section-header {
+                margin-bottom: 40px;
             }
         }
     </style>
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-file-alt me-2"></i>
+                <img src="assets/img/dnsc-logo.png" alt="DNSC Logo" class="d-inline-block align-text-top">
                 DNSC E-Request
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#features">Features</a>
+                        <a class="nav-link" href="#features">Features</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#how-it-works">How It Works</a>
@@ -149,7 +434,7 @@ if (isset($_SESSION['user_id'])) {
                     <li class="nav-item">
                         <a class="nav-link" href="#team">Our Team</a>
                     </li>
-                    <li class="nav-item ms-lg-3">
+                    <li class="nav-item ms-lg-2">
                         <a class="btn btn-success" href="login.php">
                             <i class="fas fa-sign-in-alt me-1"></i> Login
                         </a>
@@ -168,20 +453,57 @@ if (isset($_SESSION['user_id'])) {
     <section class="hero-section">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6">
+                <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
                     <h1 class="hero-title">DNSC E-Request Management System</h1>
-                    <p class="lead mb-4">A streamlined solution for processing registrar-related documents and certificates for students and graduates.</p>
-                    <div class="d-flex gap-3">
-                        <a href="login.php" class="btn btn-light btn-lg">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
-                        </a>
-                        <a href="register.php" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Register
-                        </a>
-                    </div>
+                    <p class="lead mb-4 fw-normal" style="font-size: 1.25rem;">A streamlined solution for processing registrar-related documents and certificates for students and graduates.</p>
+                    <a href="#features" class="btn btn-light btn-lg rounded-pill px-4 me-2">
+                        <i class="fas fa-arrow-down me-2"></i>Discover More
+                    </a>
                 </div>
-                <div class="col-lg-6 d-none d-lg-block">
-                    <img src="" alt="E-Request System" class="img-fluid rounded shadow-lg">
+                <div class="col-lg-6 d-none d-lg-block" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                    <!-- Carousel implementation -->
+                    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                        <!-- Carousel indicators -->
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        </div>
+                        
+                        <!-- Carousel items -->
+                        <div class="carousel-inner rounded-lg shadow-lg">
+                            <div class="carousel-item active">
+                                <img src="assets/img/DNSC_thumbnail.png" class="d-block w-100" alt="E-Request System">
+                                <div class="carousel-caption d-none d-md-block">
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="assets/img/campus.jpg" class="d-block w-100" alt="DNSC Campus">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>DNSC Campus</h5>
+                                    <p>Nurturing excellence in education</p>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <img src="assets/img/students.jpg" class="d-block w-100" alt="DNSC Students">
+                                <div class="carousel-caption d-none d-md-block">
+                                    <h5>Our Students</h5>
+                                    <p>The future of tomorrow</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Carousel controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                    <!-- End of carousel -->
                 </div>
             </div>
         </div>
@@ -189,14 +511,14 @@ if (isset($_SESSION['user_id'])) {
 
     <!-- Features Section -->
     <section class="py-5" id="features">
-        <div class="container">
-            <div class="text-center mb-5">
+        <div class="container py-4">
+            <div class="text-center section-header" data-aos="fade-up">
                 <h2 class="fw-bold">System Features</h2>
-                <p class="text-muted">Efficient document processing and tracking at your fingertips</p>
+                <p class="text-muted lead">Efficient document processing and tracking at your fingertips</p>
             </div>
             
             <div class="row g-4">
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                     <div class="card feature-card p-4">
                         <div class="text-center">
                             <i class="fas fa-file-alt feature-icon"></i>
@@ -206,7 +528,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="card feature-card p-4">
                         <div class="text-center">
                             <i class="fas fa-clock feature-icon"></i>
@@ -216,7 +538,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                     <div class="card feature-card p-4">
                         <div class="text-center">
                             <i class="fas fa-bell feature-icon"></i>
@@ -226,7 +548,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="400">
                     <div class="card feature-card p-4">
                         <div class="text-center">
                             <i class="fas fa-history feature-icon"></i>
@@ -236,7 +558,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="500">
                     <div class="card feature-card p-4">
                         <div class="text-center">
                             <i class="fas fa-calendar-check feature-icon"></i>
@@ -246,7 +568,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="600">
                     <div class="card feature-card p-4">
                         <div class="text-center">
                             <i class="fas fa-shield-alt feature-icon"></i>
@@ -261,18 +583,19 @@ if (isset($_SESSION['user_id'])) {
 
     <!-- How It Works Section -->
     <section class="py-5 bg-light" id="how-it-works">
-        <div class="container">
-            <div class="text-center mb-5">
+        <div class="container py-4">
+            <div class="text-center section-header" data-aos="fade-up">
                 <h2 class="fw-bold">How It Works</h2>
-                <p class="text-muted">Simple steps to request and receive your documents</p>
+                <p class="text-muted lead">Simple steps to request and receive your documents</p>
             </div>
             
             <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="d-flex mb-4">
-                                <div class="bg-success text-white rounded-circle p-3 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                <div class="col-lg-9">
+                    <div class="card border-0 shadow-sm" data-aos="fade-up">
+                        <div class="card-body p-4 p-lg-5">
+                            <!-- Step 1 -->
+                            <div class="step-item d-flex" data-aos="fade-up" data-aos-delay="100">
+                                <div class="step-circle text-white me-4">
                                     <h4 class="m-0">1</h4>
                                 </div>
                                 <div>
@@ -281,8 +604,9 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
                             </div>
                             
-                            <div class="d-flex mb-4">
-                                <div class="bg-success text-white rounded-circle p-3 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            <!-- Step 2 -->
+                            <div class="step-item d-flex" data-aos="fade-up" data-aos-delay="200">
+                                <div class="step-circle text-white me-4">
                                     <h4 class="m-0">2</h4>
                                 </div>
                                 <div>
@@ -291,8 +615,9 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
                             </div>
                             
-                            <div class="d-flex mb-4">
-                                <div class="bg-success text-white rounded-circle p-3 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            <!-- Step 3 -->
+                            <div class="step-item d-flex" data-aos="fade-up" data-aos-delay="300">
+                                <div class="step-circle text-white me-4">
                                     <h4 class="m-0">3</h4>
                                 </div>
                                 <div>
@@ -301,8 +626,9 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
                             </div>
                             
-                            <div class="d-flex mb-4">
-                                <div class="bg-success text-white rounded-circle p-3 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            <!-- Step 4 -->
+                            <div class="step-item d-flex" data-aos="fade-up" data-aos-delay="400">
+                                <div class="step-circle text-white me-4">
                                     <h4 class="m-0">4</h4>
                                 </div>
                                 <div>
@@ -311,8 +637,9 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
                             </div>
                             
-                            <div class="d-flex">
-                                <div class="bg-success text-white rounded-circle p-3 me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            <!-- Step 5 -->
+                            <div class="step-item d-flex" data-aos="fade-up" data-aos-delay="500">
+                                <div class="step-circle text-white me-4">
                                     <h4 class="m-0">5</h4>
                                 </div>
                                 <div>
@@ -328,89 +655,77 @@ if (isset($_SESSION['user_id'])) {
     </section>
 
     <!-- Team Section -->
-    <section class="py-5" id="team">
-        <div class="container">
-            <div class="text-center mb-5">
+    <section class="py-5 team-section" id="team">
+        <div class="container py-4">
+            <div class="text-center section-header" data-aos="fade-up">
                 <h2 class="fw-bold">Meet Our Team</h2>
-                <p class="text-muted">The Team behind the DNSC E-Request System</p>
+                <p class="text-muted lead">The Team behind the DNSC E-Request System</p>
             </div>
             
             <div class="row g-4">
-                <div class="col-md-3">
-                    <div class="card team-card">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card team-card h-100">
                         <div class="card-body text-center p-4">
-                            <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width: 120px; height: 120px; background-color: #e9ecef;">
+                            <div class="rounded-circle overflow-hidden mx-auto mb-4" style="width: 140px; height: 140px; background-color: #e9ecef;">
                                 <img src="assets/img/Duran.jpg" alt="Christian Duran" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <h5 class="card-title">Christian Duran</h5>
-                            <p class="card-text text-muted">Project Leader</p>
+                            <h5 class="card-title fw-bold">Christian Dave Duran</h5>
+                            <p class="card-text text-muted mb-3">Project Leader</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="https://www.facebook.com/christian.duran.827309" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-facebook"></i></a>
+                                <a href="https://github.com/ChristInsanity" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-github"></i></a>
+                                <a href="mailto:duran.christiandave@dnsc.edu.ph" class="btn btn-sm btn-outline-success rounded-circle"><i class="fas fa-envelope"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-3">
-                    <div class="card team-card">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card team-card h-100">
                         <div class="card-body text-center p-4">
-                            <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width: 120px; height: 120px; background-color: #e9ecef;">
+                            <div class="rounded-circle overflow-hidden mx-auto mb-4" style="width: 140px; height: 140px; background-color: #e9ecef;">
                                 <img src="assets/img/ako.jpg" alt="John Lyold C. Lozada" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <h5 class="card-title">John Lyold C. Lozada</h5>
-                            <p class="card-text text-muted">Backend Developer</p>
+                            <h5 class="card-title fw-bold">John Lyold C. Lozada</h5>
+                            <p class="card-text text-muted mb-3">Backend Developer</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="https://www.facebook.com/DeJure12705" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-facebook"></i></a>
+                                <a href="https://github.com/DeJure12705" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-github"></i></a>
+                                <a href="mailto:lozada.johnlyold@dnsc.edu.ph" class="btn btn-sm btn-outline-success rounded-circle"><i class="fas fa-envelope"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-3">
-                    <div class="card team-card">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card team-card h-100">
                         <div class="card-body text-center p-4">
-                            <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width: 120px; height: 120px; background-color: #e9ecef;">
+                            <div class="rounded-circle overflow-hidden mx-auto mb-4" style="width: 140px; height: 140px; background-color: #e9ecef;">
                                 <img src="assets/img/arjean1.jpg" alt="Arjean G. Logrosa" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <h5 class="card-title">Arjean G. Logrosa</h5>
-                            <p class="card-text text-muted">Frontend Developer</p>
+                            <h5 class="card-title fw-bold">Arjean G. Logrosa</h5>
+                            <p class="card-text text-muted mb-3">Frontend Developer</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="https://www.facebook.com/arjean.logrosa" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-facebook"></i></a>
+                                <a href="https://github.com/aj-u3u" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-github"></i></a>
+                                <a href="mailto:logrosa.arjean@dnsc.edu.ph" class="btn btn-sm btn-outline-success rounded-circle"><i class="fas fa-envelope"></i></a>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="col-md-3">
-                    <div class="card team-card">
+                <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="card team-card h-100">
                         <div class="card-body text-center p-4">
-                            <div class="rounded-circle overflow-hidden mx-auto mb-3" style="width: 120px; height: 120px; background-color: #e9ecef;">
-                                <img src="assets/img/Kent.jpg" alt="Stephanie Kate O. Losabia" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div class="rounded-circle overflow-hidden mx-auto mb-4" style="width: 140px; height: 140px; background-color: #e9ecef;">
+                                <img src="assets/img/stephanie.jpg" alt="Stephanie Kate O. Losabia" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <h5 class="card-title">Stephanie Kate O. Losabia</h5>
-                            <p class="card-text text-muted">UI/UX Designer</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Login Section - Restored and updated -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="card login-card p-4">
-                        <div class="row g-0">
-                            <div class="col-md-6 d-flex align-items-center">
-                                <div class="p-4">
-                                    <h3 class="fw-bold mb-4">Ready to get started?</h3>
-                                    <p class="text-muted mb-4">Access your account to submit and track your document requests. The DNSC E-Request System is designed to make your registrar transactions faster and more efficient.</p>
-                                    <div class="d-grid gap-2">
-                                        <a href="login.php" class="btn btn-success btn-lg">
-                                            <i class="fas fa-sign-in-alt me-2"></i>Login to Your Account
-                                        </a>
-                                        <p class="text-center mt-3 mb-0">Don't have an account?</p>
-                                        <a href="register.php" class="btn btn-outline-success">
-                                            <i class="fas fa-user-plus me-2"></i>Register Now
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 d-none d-md-block">
-                                <img src="https://img.freepik.com/free-vector/mobile-login-concept-illustration_114360-83.jpg?w=826&t=st=1716211640~exp=1716212240~hmac=f3a31df2af851f58d8c0ed9f87b06f44eb0e9c5badd65a062d9a75fdef8c2ed0" alt="Login" class="img-fluid rounded-end" style="height: 100%; object-fit: cover;">
+                            <h5 class="card-title fw-bold">Stephanie Kate O. Losabia</h5>
+                            <p class="card-text text-muted mb-3">UI/UX Designer</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="https://www.facebook.com/ezraheli" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-facebook"></i></a>
+                                <a href="https://github.com/Ezraheli" class="btn btn-sm btn-outline-success rounded-circle"><i class="fab fa-github"></i></a>
+                                <a href="mailto:losabia.stephaniekate@dnsc.edu.ph" class="btn btn-sm btn-outline-success rounded-circle"><i class="fas fa-envelope"></i></a>
                             </div>
                         </div>
                     </div>
@@ -424,44 +739,113 @@ if (isset($_SESSION['user_id'])) {
         <div class="container">
             <div class="row">
                 <div class="col-lg-6 mb-4 mb-lg-0">
-                    <h5 class="text-white">DNSC E-Request Management System</h5>
-                    <p>A web-based platform designed to streamline registrar-related transactions for students and graduates.</p>
+                    <h5 class="text-white fw-bold mb-4">DNSC E-Request Management System</h5>
+                    <p class="mb-4">A web-based platform designed to streamline registrar-related transactions for students and graduates.</p>
+                    <div class="d-flex gap-3 mb-4">
+                        <a href="#" class="social-icon text-white-50"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="social-icon text-white-50"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="social-icon text-white-50"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="social-icon text-white-50"><i class="fab fa-linkedin fa-lg"></i></a>
+                    </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-                    <h5 class="text-white">Quick Links</h5>
+                <div class="col-md-3 col-sm-6 mb-4 mb-md-0">
+                    <h5 class="text-white fw-bold mb-4">Quick Links</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#features" class="text-white-50">Features</a></li>
-                        <li class="mb-2"><a href="#how-it-works" class="text-white-50">How It Works</a></li>
-                        <li class="mb-2"><a href="#team" class="text-white-50">Our Team</a></li>
-                        <li class="mb-2"><a href="login.php" class="text-white-50">Login</a></li>
-                        <li><a href="register.php" class="text-white-50">Register</a></li>
+                        <li class="mb-2"><a href="#features" class="text-white-50"><i class="fas fa-chevron-right me-2"></i>Features</a></li>
+                        <li class="mb-2"><a href="#how-it-works" class="text-white-50"><i class="fas fa-chevron-right me-2"></i>How It Works</a></li>
+                        <li class="mb-2"><a href="#team" class="text-white-50"><i class="fas fa-chevron-right me-2"></i>Our Team</a></li>
+                        <li class="mb-2"><a href="login.php" class="text-white-50"><i class="fas fa-chevron-right me-2"></i>Login</a></li>
+                        <li><a href="register.php" class="text-white-50"><i class="fas fa-chevron-right me-2"></i>Register</a></li>
                     </ul>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                    <h5 class="text-white">Contact Us</h5>
+                <div class="col-md-3 col-sm-6">
+                    <h5 class="text-white fw-bold mb-4">Contact Us</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i>Davao del Norte State College</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i>+63 951 229 7022</li>
-                        <li><i class="fas fa-envelope me-2"></i>supplybridge@dnsc.edu.ph</li>
+                        <li class="mb-3"><i class="fas fa-map-marker-alt me-2"></i>Davao del Norte State College</li>
+                        <li class="mb-3"><i class="fas fa-phone me-2"></i>+63 951 229 7022</li>
+                        <li class="mb-3"><i class="fas fa-envelope me-2"></i>DNSC_E-Request@dnsc.edu.ph</li>
                     </ul>
                 </div>
             </div>
-            <hr class="my-4 bg-light">
+            <hr class="my-4 bg-light opacity-25">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
                     <p class="mb-0">&copy; <?php echo date('Y'); ?> DNSC E-Request Management System. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
-                    <ul class="list-inline mb-0">
-                        <li class="list-inline-item"><a href="#" class="text-white-50"><i class="fab fa-facebook fa-lg"></i></a></li>
-                        <li class="list-inline-item"><a href="#" class="text-white-50"><i class="fab fa-twitter fa-lg"></i></a></li>
-                        <li class="list-inline-item"><a href="#" class="text-white-50"><i class="fab fa-instagram fa-lg"></i></a></li>
-                    </ul>
+                    <p class="mb-0">Designed by Chanchan <i class="fas fa-heart text-danger"></i> Arjean</p>
                 </div>
             </div>
         </div>
     </footer>
+    
+    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            once: true,
+            duration: 800
+        });
+        
+        // Improved Navbar scroll effect and back to top button
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            const backToTop = document.querySelector('.back-to-top');
+            
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+                backToTop.classList.add('active');
+            } else {
+                navbar.classList.remove('scrolled');
+                backToTop.classList.remove('active');
+            }
+            
+            // Add active class to nav item based on scroll position
+            const sections = document.querySelectorAll('section[id]');
+            const scrollY = window.pageYOffset;
+            
+            sections.forEach(current => {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - 100;
+                const sectionId = current.getAttribute('id');
+                
+                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    document.querySelector('.nav-link[href*=' + sectionId + ']').classList.add('active');
+                } else {
+                    document.querySelector('.nav-link[href*=' + sectionId + ']').classList.remove('active');
+                }
+            });
+        });
+        
+        // Back to top functionality
+        document.getElementById('backToTop').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]:not(#backToTop)').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>

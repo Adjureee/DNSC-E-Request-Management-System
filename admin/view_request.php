@@ -115,15 +115,15 @@ $request = $result->fetch_assoc();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .sidebar { min-height: 100vh; background-color: #198754; color: white; }
+        .sidebar { min-height: 100vh; background-color: #2d5516; color: white; }
         .nav-link { color: rgba(255,255,255,.8); }
         .nav-link:hover { color: white; }
         .nav-link.active { color: white; background-color: rgba(255,255,255,.2); }
         .request-details-card { border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .btn-primary { background-color: #198754; border-color: #198754; }
-        .btn-primary:hover { background-color: #146c43; border-color: #146c43; }
-        .btn-outline-secondary { color: #198754; border-color: #198754; }
-        .btn-outline-secondary:hover { background-color: #198754; border-color: #198754; color: white; }
+        .btn-primary { background-color: #498428; border-color: #498428; }
+        .btn-primary:hover { background-color: #2d5516; border-color: #2d5516; }
+        .btn-outline-secondary { color: #498428; border-color: #498428; }
+        .btn-outline-secondary:hover { background-color: #2d5516; border-color: #2d5516; color: white; }
         .card-header { background-color: #e9f7ef; border-bottom: 1px solid #d1e7dd; }
     </style>
 </head>
@@ -135,7 +135,7 @@ $request = $result->fetch_assoc();
             <div class="position-sticky pt-3">
                 <div class="text-center mb-4">
                     <h5>DNSC E-Request System</h5>
-                    <p class="text-muted">Admin Panel</p>
+                    <p class="text-white">Admin Panel</p>
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
@@ -143,7 +143,7 @@ $request = $result->fetch_assoc();
                     <li class="nav-item"><a class="nav-link" href="pending.php"><i class="fas fa-clock me-2"></i>Pending Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="approved.php"><i class="fas fa-check-circle me-2"></i>Approved Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="completed.php"><i class="fas fa-check-double me-2"></i>Completed Requests</a></li>
-                    <li class="nav-item mt-5"><a class="nav-link" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    <!-- <li class="nav-item mt-5"><a class="nav-link" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li> -->
                 </ul>
             </div>
         </div>
