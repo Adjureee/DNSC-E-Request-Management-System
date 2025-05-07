@@ -8,7 +8,7 @@ if (isset($_SESSION['user_id'])) {
         exit;
     } else {
         header('Location: student/dashboard.php');
-        exit;
+        exit;   
     }
 }
 ?>
