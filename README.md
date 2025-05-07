@@ -114,12 +114,12 @@ DNSC-E-Request-System/
 
 ## License & Copyright
 
-© 2023 DNSC E-Request Management System. All rights reserved.
+© 2025 DNSC E-Request Management System. All rights reserved.
 
 This project is developed for Davao del Norte State College and is not licensed for distribution or use outside the institution without explicit permission.
 
 ## Contact
 
 For inquiries or support regarding this system, please contact:
-- Email: registrar@dnsc.edu.ph
+- Email: lozadajohnlyold@dnsc.edu.ph
 - Phone: +63 951 229 7022
