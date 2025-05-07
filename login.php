@@ -5,8 +5,12 @@ require_once 'config.php';
 if (isLoggedIn()) {
     if (isAdmin()) {
         redirect('admin/dashboard.php');
-    } else {
+    } elseif (isStudent()) {
         redirect('student/dashboard.php');
+    } elseif (isAlumni()) {
+        redirect('alumni/dashboard.php');
+    } else {
+        redirect('select_role.php'); // Handle null or unknown roles
     }
 }
 
@@ -14,41 +18,50 @@ $error = '';
 
 // Process login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = sanitize($_POST['username']);
+    $stud_id = sanitize($_POST['stud_id']);
     $password = $_POST['password'];
-    
-    $sql = "SELECT id, username, password, role, full_name FROM users WHERE username = ?";
+
+    $sql = "SELECT id, stud_id, password, role, full_name, verification_status FROM users WHERE stud_id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $username);
+    $stmt->bind_param("s", $stud_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
-        
-        if (password_verify($password, $user['password'])) {
+
+        if ($user['verification_status'] === 'pending') {
+            $error = 'Your registration is still pending approval.';
+        } elseif ($user['verification_status'] === 'rejected') {
+            $error = 'Your registration was rejected. Please contact the registrar.';
+        } elseif (password_verify($password, $user['password'])) {
             // Set session variables
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
+            $_SESSION['stud_id'] = $user['stud_id'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['full_name'] = $user['full_name'];
-            
+
             // Redirect based on role
             if ($user['role'] === 'admin') {
                 redirect('admin/dashboard.php');
-            } else {
+            } elseif ($user['role'] === 'student') {
                 redirect('student/dashboard.php');
+            } elseif ($user['role'] === 'alumni') {
+                redirect('alumni/dashboard.php');
+            } else {
+                redirect('select_role.php'); // Redirect if role is NULL or unknown
             }
         } else {
             $error = 'Invalid password';
         }
     } else {
-        $error = 'Username not found';
+        $error = 'Student ID not found';
     }
-    
+
     $stmt->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,11 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($error): ?>
                     <div class="alert alert-danger"><?php echo $error; ?></div>
                 <?php endif; ?>
-                
+
                 <form id="loginForm" method="POST" action="">
                     <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <label for="stud_id" class="form-label">Student ID</label>
+                        <input type="text" class="form-control" id="stud_id" name="stud_id" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
@@ -123,11 +136,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Ajax login can be implemented here
-            // For simplicity, using regular form submission for now
-        });
-    </script>
 </body>
 </html>

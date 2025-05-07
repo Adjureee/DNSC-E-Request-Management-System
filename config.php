@@ -33,10 +33,13 @@ function isAdmin() {
 function isStudent() {
     return isLoggedIn() && $_SESSION['role'] === 'student';
 }
+function isAlumni() {
+    return isLoggedIn() && $_SESSION['role'] === 'alumni';
+}
 
 function checkAuth() {
     if (!isLoggedIn()) {
-        redirect('login.php');
+        redirect('login.php'); 
     }
 }
 
@@ -51,6 +54,13 @@ function checkStudentAuth() {
         redirect('login.php');
     }
 }
+
+function checkAlumniAuth() {
+    if (!isAlumni()) {
+        redirect('login.php');
+    }
+}
+
 
 // Function to sanitize input data
 function sanitize($data) {

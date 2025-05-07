@@ -2,13 +2,22 @@
 require_once '../config.php';
 checkStudentAuth();
 
-$request_type = $details = $institute = $program = $year_level = $semester = "";
+$request_type = $details = $year_level = $semester = "";
 $request_type_err = $details_err = "";
+
+// Fetch the logged-in user's institute and program
+$user_id = $_SESSION['user_id'];
+$sql = "SELECT institute, program FROM users WHERE id = ?";
+if ($stmt = $conn->prepare($sql)) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $stmt->bind_result($institute, $program);
+    $stmt->fetch();
+    $stmt->close();
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
     $request_type = sanitize(trim($_POST["request_type"]));
-    $institute = sanitize(trim($_POST["institute"]));
-    $program = sanitize(trim($_POST["program"]));
     $year_level = sanitize(trim($_POST["year_level"]));
     $semester = isset($_POST["semester"]) ? sanitize(trim($_POST["semester"])) : "";
     $details = sanitize(trim($_POST["details"]));
@@ -93,25 +102,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
                                 <option>Other</option>
                             </select>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Institute</label>
-                            <select class="form-select" name="institute" id="institute" required>
-                                <option value="">Select Institute</option>
-                                <option value="IC">Institute of Computing (IC)</option>
-                                <option value="IAAS">Institute of Aquatic and Applied Sciences (IAAS)</option>
-                                <option value="ILEGG">Institute of Leadership, Entrepreneurship, and Good Governance (ILEGG)</option>
-                                <option value="ITEd">Institute of Teacher Education (ITEd)</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Program</label>
-                            <select class="form-select" name="program" id="program" required>
-                                <option value="">Select Program</option>
-                            </select>
-                        </div>
-
+                        
+                        <!-- Year Level -->
                         <div class="mb-3">
                             <label class="form-label">Year Level</label>
                             <select class="form-select" name="year_level" id="year_level" required>
@@ -120,10 +112,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
                                 <option>2nd Year</option>
                                 <option>3rd Year</option>
                                 <option>4th Year</option>
-                                <option>Graduate</option>
                             </select>
                         </div>
 
+                        <!-- Semester -->
                         <div class="mb-3" id="semester_field">
                             <label class="form-label">Semester</label>
                             <select class="form-select" name="semester" id="semester" required>
@@ -159,15 +151,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
                 </div>
                 <div class="modal-body">
                     <p><strong>Request Type:</strong> <span id="preview_request_type"></span></p>
-                    <p><strong>Institute:</strong> <span id="preview_institute"></span></p>
-                    <p><strong>Program:</strong> <span id="preview_program"></span></p>
+                    <p><strong>Institute:</strong> <span id="preview_institute"><?php echo htmlspecialchars($institute); ?></span></p>
+                    <p><strong>Program:</strong> <span id="preview_program"><?php echo htmlspecialchars($program); ?></span></p>
                     <p><strong>Year Level:</strong> <span id="preview_year_level"></span></p>
                     <p id="semester_preview"><strong>Semester:</strong> <span id="preview_semester"></span></p>
                     <p><strong>Details:</strong> <span id="preview_details"></span></p>
 
                     <input type="hidden" name="request_type" id="hidden_request_type">
-                    <input type="hidden" name="institute" id="hidden_institute">
-                    <input type="hidden" name="program" id="hidden_program">
+                    <input type="hidden" name="institute" id="hidden_institute" value="<?php echo htmlspecialchars($institute); ?>">
+                    <input type="hidden" name="program" id="hidden_program" value="<?php echo htmlspecialchars($program); ?>">
                     <input type="hidden" name="year_level" id="hidden_year_level">
                     <input type="hidden" name="semester" id="hidden_semester">
                     <input type="hidden" name="details" id="hidden_details">
@@ -210,24 +202,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
         }
 
         document.getElementById("preview_request_type").innerText = form["request_type"].value;
-        document.getElementById("preview_institute").innerText = form["institute"].value;
-        document.getElementById("preview_program").innerText = form["program"].value;
         document.getElementById("preview_year_level").innerText = form["year_level"].value;
         document.getElementById("preview_details").innerText = form["details"].value;
-
-        // Handle semester preview
-        const yearLevel = form["year_level"].value;
-        if (yearLevel === "Graduate") {
-            document.getElementById("semester_preview").style.display = "none";
-        } else {
-            document.getElementById("preview_semester").innerText = form["semester"].value;
-            document.getElementById("semester_preview").style.display = "block";
-        }
+        document.getElementById("preview_semester").innerText = form["semester"].value;
+        document.getElementById("semester_preview").style.display = "block";
 
         // Hidden inputs
         document.getElementById("hidden_request_type").value = form["request_type"].value;
-        document.getElementById("hidden_institute").value = form["institute"].value;
-        document.getElementById("hidden_program").value = form["program"].value;
         document.getElementById("hidden_year_level").value = form["year_level"].value;
         document.getElementById("hidden_semester").value = form["semester"].value;
         document.getElementById("hidden_details").value = form["details"].value;
@@ -236,41 +217,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
         previewModal.show();
     });
 
-    const programsByInstitute = {
-        IC: ["BSIS", "BSIT"],
-        IAAS: ["BSAF", "BSFAS", "BSFT", "BSMB"],
-        ILEGG: ["BPA", "BSDRM", "BS ENTREP", "BSSW", "BSTM"],
-        ITEd: ["BACOMM", "BSeD", "BTLEd", "BPEd"]
-    };
-
-    document.getElementById("institute").addEventListener("change", function () {
-        const programSelect = document.getElementById("program");
-        programSelect.innerHTML = '<option value="">Select Program</option>';
-        const selected = this.value;
-        if (programsByInstitute[selected]) {
-            programsByInstitute[selected].forEach(program => {
-                const opt = document.createElement("option");
-                opt.value = program;
-                opt.innerText = program;
-                programSelect.appendChild(opt);
-            });
-        }
-    });
-
-    // Hide semester if "Graduate"
-    document.getElementById("year_level").addEventListener("change", function () {
-        const semesterField = document.getElementById("semester_field");
-        const semesterSelect = document.getElementById("semester");
-
-        if (this.value === "Graduate") {
-            semesterField.style.display = "none";
-            semesterSelect.removeAttribute("required");
-            semesterSelect.value = "";
-        } else {
-            semesterField.style.display = "block";
-            semesterSelect.setAttribute("required", "required");
-        }
-    });
 </script>
 </body>
 </html>
