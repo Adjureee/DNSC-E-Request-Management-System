@@ -73,10 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     <meta charset="UTF-8">
     <title>Register - DNSC E-Request</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
+    <style> 
+        :root {
+            --primary: #b3cc50;
+            --secondary: #6f9733;
+            --tertiary: #478026;
+            --quaternary: #2c5315;
+        }
         body {
-            background-color: #f8f9fa;
-            background: linear-gradient(to left,#336A29,#283618);
+            background: linear-gradient(to right, #b3cc50, #478026);      
         }
         .register-container {
             max-width: 550px;
@@ -133,7 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
 <div class="container register-container">
     <div class="card">
         <div class="card-header text-center">
-            <h4>Create Account</h4>
+            <h4>DNSC E-Request Management System</h4>
+            <h4>Register</h4>
         </div>
         <div class="card-body">
             <?php if ($error): ?>
@@ -155,11 +161,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                     <label>Institute</label>
                     <select name="institute" id="institute" class="form-control" required onchange="updatePrograms()">
                         <option value="" disabled selected>Select Institute</option>
-                        <option value="IC">Institute of Computing</option>
-                        <option value="IE">Institute of Engineering</option>
-                        <option value="IT">Institute of Teacher Education</option>
-                        <option value="IAS">Institute of Arts and Sciences</option>
-                        <option value="IM">Institute of Management</option>
+                        <option value="IC">Institute of Computing (IC)</option>
+                        <option value="IAAS">Institute of Aquatic and Applied ScienceS (IAAS)</option>
+                        <option value="ILEGG">Institute of Leadership, Entreprenuership, and Good Governance (ILEGG)</option>
+                        <option value="ITed">Institute of Teacher Education (ITed)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -227,11 +232,10 @@ function updatePrograms() {
     const programSelect = document.getElementById('program');
 
     const programs = {
-        IC: ['BSIT', 'BSCS'],
-        IE: ['BSCE', 'BSEE'],
-        IT: ['BSEd Math', 'BSEd English'],
-        IAS: ['AB English', 'BS Biology'],
-        IM: ['BSBA', 'BS Accountancy']
+        IC: ['BSIT', 'BSIS'],
+        IAAS: ['BSAF', 'BSFAS', 'BSFT', 'BSMB'],
+        ILEGG: ['BPA', 'BSDRM', 'BSEntrep', 'BSSW', 'BSTM'],
+        ITed: ['BAComm', 'BSEd - English', 'BSEd - Mathematics', 'BSEd - Science', 'BTLEd'],
     };
 
     programSelect.innerHTML = '<option value="" disabled selected>Select Program</option>';

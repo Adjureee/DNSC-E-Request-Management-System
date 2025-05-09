@@ -262,7 +262,7 @@ if (isset($_SESSION['user_id'])) {
         /* How It Works Section */
         .step-item {
             position: relative;
-            padding-bottom: 1.5rem;
+            padding-bottom: 1.5rem ;
         }
         
         .step-item:not(:last-child)::after {

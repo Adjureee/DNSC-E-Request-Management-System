@@ -1,3 +1,5 @@
+
+
 <?php
 require_once 'config.php';
 
@@ -71,12 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #2d5516;
-            --secondary: #C1D95C;
-            --tertiary: #498428;
+            --primary: #b3cc50;
+            --secondary: #6f9733;
+            --tertiary: #478026;
+            --quaternary: #2c5315;
         }
         body {
-            background: linear-gradient(to right, #C1D95C, #498428);      
+            background: linear-gradient(to right, #b3cc50, #478026);      
         }
         .login-container {
             max-width: 550px;
