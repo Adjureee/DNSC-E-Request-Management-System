@@ -69,25 +69,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     <title>Register - DNSC E-Request</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { 
-            background-color: #f8f9fa;
+         :root {
+            --primary: #2d5516;
+            --secondary: #C1D95C;
+            --tertiary: #498428;
+         }
+        body {
+            background: linear-gradient(to right, #C1D95C, #498428);  
         }
         .register-container {
-             max-width: 600px;
-             margin: 50px auto;
+            max-width: 550px;
+            margin: 25px auto ;
         }
-        .card { border-radius: 10px;
-             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px #000000;
         }
-        .card-header { background-color: #198754;
-             color: white;
+        .card-header {
+            background-color: #2d5516;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
         }
-        .btn-primary { width: 100%;
-             background-color: #198754;
+        .btn-primary {
+            width: 100%;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
-        #preview-img { 
-            max-height: 150px; cursor:pointer;
-            margin-top: 10px; display: none;
+        .btn-primary:hover {
+            background-color: #2d5516;
+            border-color: #2d5516;
+        }
+        .btn-success {
+            background-color: #2d5516;
+            border-color: #2d5516;
+        }
+        .btn-success:hover {
+            background-color: #2d5516;
+            border-color: #2d5516;
+        }
+        a {
+            color: #2d5516;
+        }
+        a:hover {
+            color: #2d5516;
+        }
+        .form-control:focus {
+            border-color: #2d5516;
+            box-shadow: 0 0 0 0.25rem #198754;
+        }
+        .loading {
+            display: none;
+            margin: 0 auto;
         }
         .modal-lg { 
             max-width: 450px;
@@ -95,88 +127,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     </style>
 </head>
 <body>
+    <div class="container register-container">
+        <div class="card">
+            <div class="card-header text-center py-3">
+                <h4>Register for DNSC E-Request System</h4>
+            </div>
+            <div class="card-body p-8">
+                <?php if ($error): ?>
+                    <div class="alert alert-danger">
+                        <?php echo $error; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($success): ?>
+                    <div class="alert alert-success">
+                        <?php echo $success; ?>
+                    </div>
+                    <div class="text-center">
+                        <a href="login.php" class="btn btn-success">Go to Login</a>
+                    </div>
+                <?php else: ?>
+                
+                <form id="registerForm" method="POST" action="" novalidate>
+            
+<!-- wala pa na implement --> 
+            <div class="mb-3">
+                <label for="Account-type" class="form-label">Account Type</label>
+                <select class="form-select" id="Account-type" name="account-type" required>
+                    <option value="">-- Select Role --</option>
+                    <option value="students">Student</option>
+                    <option value="alumni">Alumni</option>
+                </select>
+            </div>
 
-<div class="container register-container">
-    <div class="card">
-        <div class="card-header text-center">
-            <h4>Create Account</h4>
-        </div>
-        <div class="card-body">
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= $error ?></div>
-            <?php elseif ($success): ?>
-                <div class="alert alert-success"><?= $success ?></div>
-            <?php endif; ?>
+              <!-- Students Input -->
+              <div class="mb-3" id="studentsInputWrapper" style="display: none;">
+                <label for="students-role" class="form-label">Identification Number:</label>
+                <input type="text" class="form-control" id="students-role" name="students-role" placeholder="Enter your Student ID" required>
+            </div>
+            <!-- Alumni Input -->
+            <div class="mb-3" id="alumniInputWrapper" style="display: none;">
+                <label for="alumni-role" class="form-label">Identification Number:</label>
+                <input type="text" class="form-control" id="alumni-role" name="alumni-role" placeholder="Enter your Alumni ID" required>
+            </div>
+        
+            <script>
+                const roleSelect = document.getElementById('Account-type');
+                const inputSections = {
+                    students: document.getElementById('studentsInputWrapper'),
+                    alumni: document.getElementById('alumniInputWrapper'),
+                };
+                roleSelect.addEventListener('change', function () {
+                    const selected = this.value;
+                    for (const key in inputSections) {
+                        inputSections[key].style.display = (key === selected) ? 'block' : 'none';
+                    }
+                });
+            </script>
+<!-- wala pa na implement -->
 
-            <form id="registerForm" action="register.php" method="POST" enctype="multipart/form-data" novalidate>
-                <div class="form-group">
-                    <label>Fullname</label>
-                    <input type="text" name="full_name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Student ID</label>
-                    <input type="text" name="stud_id" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Institute</label>
-                    <select name="institute" id="institute" class="form-control" required onchange="updatePrograms()">
-                        <option value="" disabled selected>Select Institute</option>
-                        <option value="IC">Institute of Computing</option>
-                        <option value="IE">Institute of Engineering</option>
-                        <option value="IT">Institute of Teacher Education</option>
-                        <option value="IAS">Institute of Arts and Sciences</option>
-                        <option value="IM">Institute of Management</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Program</label>
-                    <select name="program" id="program" class="form-control" required>
-                        <option value="" disabled selected>Select Program</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" name="confirm_password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Upload Photo</label>
-                    <input type="file" name="photo" class="form-control-file" accept="image/*" onchange="previewPhoto(this)" required>
-                    <img id="preview-img" class="img-thumbnail" onclick="openImageModal()" />
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="pre_selected_role" class="form-control" required>
-                        <option value="" disabled selected>Select Status</option>
-                        <option value="student">Current Student</option>
-                        <option value="alumni">Alumni/Graduate</option>
-                    </select>
-                </div>
-
-                <button type="button" class="btn btn-primary" onclick="validateAndShowModal()">Confirm</button>
-                <p class="text-center mt-2">Already have an account? <a href="login.php">Login</a></p>
-
-                <!-- Confirmation Modal -->
-                <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Confirm Submission</h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            </div>
-                            <div class="modal-body">Are you sure you want to submit this registration form?</div>
-                            <div class="modal-footer">
-                                <button type="submit" name="registerbtn" class="btn btn-success">Yes, Submit</button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Cancel</button>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($formData['full_name']); ?>" required>
+                        <div class="invalid-feedback">Please enter your full name</div>
                     </div>
                 </div>
 

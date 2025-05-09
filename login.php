@@ -70,37 +70,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - DNSC E-Request Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary: #2d5516;
+            --secondary: #C1D95C;
+            --tertiary: #498428;
+        }
         body {
-            background-color: #f8f9fa;
-            /* background: linear-gradient(to right,#336A29,#283618); */
+            background: linear-gradient(to right, #C1D95C, #498428);      
         }
         .login-container {
-            max-width: 450px;
-            margin: 100px auto;
+            max-width: 550px;
+            margin: 150px auto;
         }
         .card {
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .card-header {
-            background-color: #336A29;
+            background-color:#2d5516;
             color: white;
             border-radius: 10px 10px 0 0 !important;
         }
         .btn-primary {
             width: 100%;
-            background-color: #336A29;
-            border-color: #336A29;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-primary:hover {
-            background-color: #283618;
-            border-color: #283618;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         a {
-            color: #DDA15E;
+            color: #2d5516;
         }
         a:hover {
-            color: #BC6C25 ;
+            color: #2d5516;
         }
     </style>
 </head>
@@ -116,6 +120,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <form id="loginForm" method="POST" action="">
+
+<!-- wala pa na implement-->
+<div class="mb-3">
+                <label for="Account-type" class="form-label">Account Type</label>
+                <select class="form-select" id="Account-type" name="account-type" required>
+                    <option value="">-- Select Role --</option>
+                    <option value="students">Student</option>
+                    <option value="alumni">Alumni</option>
+                </select>
+            </div>
+
+            <!-- Students Input -->
+            <div class="mb-3" id="studentsInputWrapper" style="display: none;">
+                <label for="students-role" class="form-label">Identification Number:</label>
+                <input type="text" class="form-control" id="students-role" name="students-role" placeholder="Enter your Student ID" required>
+            </div>
+            <!-- Alumni Input -->
+            <div class="mb-3" id="alumniInputWrapper" style="display: none;">
+                <label for="alumni-role" class="form-label">Identification Number:</label>
+                <input type="text" class="form-control" id="alumni-role" name="alumni-role" placeholder="Enter your Alumni ID" required>
+            </div>
+
+            <script>
+                const roleSelect = document.getElementById('Account-type');
+                const inputSections = {
+                    students: document.getElementById('studentsInputWrapper'),
+                    alumni: document.getElementById('alumniInputWrapper'),
+                };
+                roleSelect.addEventListener('change', function () {
+                    const selected = this.value;
+                    for (const key in inputSections) {
+                        inputSections[key].style.display = (key === selected) ? 'block' : 'none';
+                    }
+                });
+            </script>
+<!-- wala pa na implement -->
+
                     <div class="mb-3">
                         <label for="stud_id" class="form-label">Student ID</label>
                         <input type="text" class="form-control" id="stud_id" name="stud_id" required>
