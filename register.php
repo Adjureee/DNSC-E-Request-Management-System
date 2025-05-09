@@ -74,146 +74,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     <title>Register - DNSC E-Request</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-<<<<<<< HEAD
-<<<<<<< HEAD
-         :root {
-            --primary: #2d5516;
-            --secondary: #C1D95C;
-            --tertiary: #498428;
-         }
-        body {
-            background: linear-gradient(to right, #C1D95C, #498428);  
-        }
-        .register-container {
-            max-width: 550px;
-            margin: 25px auto ;
-        }
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px #000000;
-        }
-        .card-header {
-            background-color: #2d5516;
-            color: white;
-            border-radius: 10px 10px 0 0 !important;
-        }
-        .btn-primary {
-            width: 100%;
-            background-color: #2d5516;
-            border-color: #2d5516;
-        }
-        .btn-primary:hover {
-            background-color: #2d5516;
-            border-color: #2d5516;
-        }
-        .btn-success {
-            background-color: #2d5516;
-            border-color: #2d5516;
-        }
-        .btn-success:hover {
-            background-color: #2d5516;
-            border-color: #2d5516;
-        }
-        a {
-            color: #2d5516;
-        }
-        a:hover {
-            color: #2d5516;
-        }
-        .form-control:focus {
-            border-color: #2d5516;
-            box-shadow: 0 0 0 0.25rem #198754;
-        }
-        .loading {
-            display: none;
-            margin: 0 auto;
-        }
-        .modal-lg { 
-            max-width: 450px;
-        }
-=======
-=======
->>>>>>> parent of 590c157 (Some enhancement)
         body { background-color: #f8f9fa; }
         .register-container { max-width: 600px; margin: 50px auto; }
         .card { border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .card-header { background-color: #198754; color: white; }
         .btn-primary { width: 100%; background-color: #198754; }
-<<<<<<< HEAD
->>>>>>> parent of 590c157 (Some enhancement)
-=======
->>>>>>> parent of 590c157 (Some enhancement)
     </style>
 </head>
 <body>
-    <div class="container register-container">
-        <div class="card">
-            <div class="card-header text-center py-3">
-                <h4>Register for DNSC E-Request System</h4>
-            </div>
-            <div class="card-body p-8">
-                <?php if ($error): ?>
-                    <div class="alert alert-danger">
-                        <?php echo $error; ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if ($success): ?>
-                    <div class="alert alert-success">
-                        <?php echo $success; ?>
-                    </div>
-                    <div class="text-center">
-                        <a href="login.php" class="btn btn-success">Go to Login</a>
-                    </div>
-                <?php else: ?>
-                
-                <form id="registerForm" method="POST" action="" novalidate>
-            
-<!-- wala pa na implement --> 
-            <div class="mb-3">
-                <label for="Account-type" class="form-label">Account Type</label>
-                <select class="form-select" id="Account-type" name="account-type" required>
-                    <option value="">-- Select Role --</option>
-                    <option value="students">Student</option>
-                    <option value="alumni">Alumni</option>
-                </select>
-            </div>
 
-              <!-- Students Input -->
-              <div class="mb-3" id="studentsInputWrapper" style="display: none;">
-                <label for="students-role" class="form-label">Identification Number:</label>
-                <input type="text" class="form-control" id="students-role" name="students-role" placeholder="Enter your Student ID" required>
-            </div>
-            <!-- Alumni Input -->
-            <div class="mb-3" id="alumniInputWrapper" style="display: none;">
-                <label for="alumni-role" class="form-label">Identification Number:</label>
-                <input type="text" class="form-control" id="alumni-role" name="alumni-role" placeholder="Enter your Alumni ID" required>
-            </div>
-        
-            <script>
-                const roleSelect = document.getElementById('Account-type');
-                const inputSections = {
-                    students: document.getElementById('studentsInputWrapper'),
-                    alumni: document.getElementById('alumniInputWrapper'),
-                };
-                roleSelect.addEventListener('change', function () {
-                    const selected = this.value;
-                    for (const key in inputSections) {
-                        inputSections[key].style.display = (key === selected) ? 'block' : 'none';
-                    }
-                });
-            </script>
-<!-- wala pa na implement -->
+<div class="container register-container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h4>Create Account</h4>
+        </div>
+        <div class="card-body">
+            <?php if ($error): ?>
+                <div class="alert alert-danger"><?= $error ?></div>
+            <?php elseif ($success): ?>
+                <div class="alert alert-success"><?= $success ?></div>
+            <?php endif; ?>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($formData['full_name']); ?>" required>
-                        <div class="invalid-feedback">Please enter your full name</div>
-=======
-=======
->>>>>>> parent of 590c157 (Some enhancement)
             <form action="register.php" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Fullname</label>
@@ -285,10 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Cancel</button>
                             </div>
                         </div>
-<<<<<<< HEAD
->>>>>>> parent of 590c157 (Some enhancement)
-=======
->>>>>>> parent of 590c157 (Some enhancement)
                     </div>
                 </div>
 
