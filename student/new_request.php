@@ -48,19 +48,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
     <title>New Request</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary: #b3cc50;
+            --secondary: #6f9733;
+            --tertiary: #478026;
+            --quaternary: #2c5315;
+        }
         body {
-            background-color: #f8f9fa;
+            background: #e9f7ef;   
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: var(--quaternary);
+            border-color:var(--tertiary);
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: var(--quaternary);
+            border-color: var(--primary);
         }
         .btn-danger {
-            background-color: #dc3545;
+            color: #dc3545 ;
+            background-color: white;
             border-color: #dc3545;
         }
         .btn-danger:hover {
@@ -68,14 +75,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
             border-color: #b02a37;
         }
         .modal-header {
-            background-color: #198754;
+            background-color: var(--quaternary);
             color: white;
         }
         .modal-body p {
             margin-bottom: 10px;
             padding: 8px;
             background-color: #f1fdf6;
-            border-left: 5px solid #198754;
+            border-left: 5px solid var(--quaternary);
+        } 
+        .card-header h4 {
+            color: white; /* optional: change text color */
+            padding: 10px; /* optional: add padding */
+            border-radius: 4px; /* optional: rounded corners */
         }
        
     </style>

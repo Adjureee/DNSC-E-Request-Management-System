@@ -20,16 +20,15 @@ $user = $stmt->get_result()->fetch_assoc();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root {
-            --primary: #2d5516;
-            --secondary: #C1D95C;
-            --tertiary: #498428;
+       :root {
+            --primary: #b3cc50;
+            --secondary: #6f9733;
+            --tertiary: #478026;
+            --quaternary: #2c5315;
         }
-
         body {
-            background-color: var(--secondary);
+        background-color: white;        
         }
-
         .profile-container {
             min-height: 100vh;
         }
@@ -37,12 +36,12 @@ $user = $stmt->get_result()->fetch_assoc();
         .profile-card {
             border: none;
             border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 20px #000000;
             background-color: #fff;
         }
 
         .profile-header {
-            background-color: var(--primary);
+            background-color: var(--quaternary);
             color: white;
             border-top-left-radius: 20px;
             border-top-right-radius: 20px;
@@ -57,6 +56,7 @@ $user = $stmt->get_result()->fetch_assoc();
 
         .profile-body {
             padding: 30px;
+            background-color: #f1fdf6;
         }
 
         .profile-body p {
@@ -70,14 +70,14 @@ $user = $stmt->get_result()->fetch_assoc();
         }
 
         .btn-dashboard {
+            color: white;
             background-color: var(--tertiary);
-            border-color: var(--tertiary);
+            border-color: var(--primary);
         }
-
-        .btn-dashboard:hover {
-            background-color: var(--secondary);
-            border-color: var(--secondary);
-            color: #000;
+            .btn-dashboard:hover {
+                color: white;
+                background-color: var(--quaternary);
+                border-color: var(--secondary);
         }
     </style>
 </head>

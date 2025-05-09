@@ -41,7 +41,7 @@ $latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
         }
         .nav-link {

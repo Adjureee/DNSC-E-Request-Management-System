@@ -249,7 +249,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 <!-- Stats Cards -->
                 <div class="row my-4">
                     <div class="col-md-3 mb-4">
-                    <div class="card dashboard-card" style="background-color: #2d5516; color: white;">
+                    <div class="card dashboard-card" style="background-color: #2c5315; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Total Requests</h5>
@@ -260,7 +260,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                     </div>
                     <div class="col-md-3 mb-4">
-                        <div class="card dashboard-card" style="background-color: #498428; color: white;">
+                        <div class="card dashboard-card" style="background-color: #478026; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Pending</h5>
@@ -271,7 +271,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                     </div>
                     <div class="col-md-3 mb-4">
-                        <div class="card dashboard-card" style="background-color: #749E35; color: white;">
+                        <div class="card dashboard-card" style="background-color: #6f9733; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Approved</h5>
@@ -282,7 +282,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                     </div>
                     <div class="col-md-3 mb-4">
-                        <div class="card dashboard-card" style="background-color: #B3CC50; color: white;">
+                        <div class="card dashboard-card" style="background-color: #b3cc50; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Completed</h5>
