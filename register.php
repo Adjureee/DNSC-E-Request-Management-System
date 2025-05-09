@@ -131,6 +131,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
             padding-left: 20px;
             margin-bottom: 0;
         }
+        #preview-img { 
+            max-height: 150px; cursor:pointer;
+            margin-top: 10px; display: none;
+        }
+        .modal-lg { 
+            max-width: 450px;
+        }
     </style>
 </head>
 <body>
