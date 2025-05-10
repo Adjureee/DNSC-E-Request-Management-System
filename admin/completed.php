@@ -2,18 +2,29 @@
 require_once '../config.php';
 checkAdminAuth();
 
-// Get completed requests
-$stmt = $conn->prepare("
-    SELECT r.*, u.full_name 
+$stmt1 = $conn->prepare("
+    SELECT r.*, u.full_name, 'student' AS origin 
     FROM requests r 
     JOIN users u ON r.user_id = u.id 
     WHERE r.status = 'completed'
     ORDER BY r.created_at DESC
 ");
-$stmt->execute();
-$result = $stmt->get_result();
-$completedRequests = $result->fetch_all(MYSQLI_ASSOC);
+$stmt1->execute();
+$studentRequests = $stmt1->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$stmt2 = $conn->prepare("
+    SELECT ar.*, u.full_name, 'alumni' AS origin 
+    FROM alumni_requests ar 
+    JOIN users u ON ar.user_id = u.id 
+    WHERE ar.status = 'completed'
+    ORDER BY ar.created_at DESC
+");
+$stmt2->execute();
+$alumniRequests = $stmt2->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$completedRequests = array_merge($studentRequests, $alumniRequests);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -23,33 +34,36 @@ $completedRequests = $result->fetch_all(MYSQLI_ASSOC);
     <title>Completed Requests - DNSC E-Request System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
+   <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #2d5516;
+            background-color: #198754;
             color: white;
         }
         .nav-link {
             color: rgba(255,255,255,.8);
-        }
-        .nav-link:hover {
-            color: white;
-        }
-        .nav-link.active {
+            position: relative;
+        } 
+        .nav-link:hover, .nav-link.active {
             color: white;
             background-color: rgba(255,255,255,.2);
         }
-        .dashboard-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        .badge-notification {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            background-color: red;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 50%;
         }
-        .btn-primary {
-            background-color: #498428;
-            border-color: #498428;
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
         }
-        .btn-primary:hover {
-            background-color: #2d5516;
-            border-color: #2d5516;
+        .btn-action {
+            min-width: 100px;
         }
     </style>
 </head>
@@ -94,12 +108,17 @@ $completedRequests = $result->fetch_all(MYSQLI_ASSOC);
                             Completed Requests
                         </a>
                     </li>
-                    <!-- <li class="nav-item mt-5">
+                    <li class="nav-item">
+                        <a class="nav-link" href="registration_list.php">
+                            <i class="fas fa-user-check me-2"></i> Registration List
+                        </a>
+                    </li>
+                    <li class="nav-item mt-5">
                         <a class="nav-link" href="../logout.php">
                             <i class="fas fa-sign-out-alt me-2"></i>
                             Logout
                         </a>
-                    </li> -->
+                    </li>
                 </ul>
             </div>
         </div>
@@ -133,27 +152,34 @@ $completedRequests = $result->fetch_all(MYSQLI_ASSOC);
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <?php foreach ($completedRequests as $request): ?>
-                                <tr>
-                                    <td><?php echo $request['id']; ?></td>
-                                    <td><?php echo htmlspecialchars($request['full_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($request['request_type']); ?></td>
-                                    <td>
-                                        <span class="badge bg-success"><?php echo ucfirst($request['status']); ?></span>
-                                    </td>
-                                    <td><?php echo date('M d, Y g:i A', strtotime($request['created_at'])); ?></td>
-                                    <td>
+                           <tbody>
+                            <?php foreach ($completedRequests as $request): ?>
+                            <tr>
+                                <td><?php echo $request['id']; ?></td>
+                                <td>
+                                    <?php echo htmlspecialchars($request['full_name']); ?>
+                                    <span class="badge bg-secondary ms-1"><?php echo ucfirst($request['origin']); ?></span>
+                                </td>
+                                <td><?php echo htmlspecialchars($request['request_type']); ?></td>
+                                <td>
+                                    <span class="badge bg-success"><?php echo ucfirst($request['status']); ?></span>
+                                </td>
+                                <td><?php echo date('M d, Y g:i A', strtotime($request['created_at'])); ?></td>
+                                <td>
+                                    <?php if ($request['origin'] === 'alumni'): ?>
                                         <a href="view_request.php?id=<?php echo $request['id']; ?>" class="btn btn-sm btn-primary">View</a>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                                <?php if (empty($completedRequests)): ?>
-                                <tr>
-                                    <td colspan="6" class="text-center">No completed requests found</td>
-                                </tr>
-                                <?php endif; ?>
-                            </tbody>
+                                    <?php else: ?>
+                                        <a href="view_request.php?id=<?php echo $request['id']; ?>" class="btn btn-sm btn-primary">View</a>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php if (empty($completedRequests)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center">No completed requests found</td>
+                            </tr>
+                            <?php endif; ?>
+                        </tbody>
                         </table>
                     </div>
                 </div>

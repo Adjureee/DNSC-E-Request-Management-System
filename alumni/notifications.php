@@ -1,10 +1,10 @@
 <?php
 require_once '../config.php';
-checkStudentAuth();
+checkAlumniAuth();
 
 $user_id = $_SESSION['user_id'];
 
-// Handle marking all as read
+
 if (isset($_GET['mark_read']) && $_GET['mark_read'] === 'all') {
     $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?");
     $stmt->bind_param("i", $user_id);
@@ -12,7 +12,7 @@ if (isset($_GET['mark_read']) && $_GET['mark_read'] === 'all') {
     redirect('notifications.php');
 }
 
-// Handle deleting a single notification
+
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $notification_id = (int)$_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM notifications WHERE id = ? AND user_id = ?");
@@ -21,7 +21,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     redirect('notifications.php');
 }
 
-// Handle deleting all read notifications
+
 if (isset($_GET['delete_all']) && $_GET['delete_all'] === 'read') {
     $stmt = $conn->prepare("DELETE FROM notifications WHERE user_id = ? AND is_read = 1");
     $stmt->bind_param("i", $user_id);
@@ -29,7 +29,7 @@ if (isset($_GET['delete_all']) && $_GET['delete_all'] === 'read') {
     redirect('notifications.php');
 }
 
-// Fetch paginated notifications
+
 $limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page - 1) * $limit;
@@ -44,7 +44,7 @@ $stmt->bind_param("iii", $user_id, $start, $limit);
 $stmt->execute();
 $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-// Count total and unread
+
 $stmt = $conn->prepare("SELECT COUNT(*) as total FROM notifications WHERE user_id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -82,15 +82,6 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
             color: white;
             background-color: rgba(255,255,255,.2);
         }
-        .notification-badge {
-            position: absolute;
-            top: 0;
-            right: 0;
-            padding: 0.25rem 0.6rem;
-            font-size: 0.75rem;
-            line-height: 1;
-            border-radius: 50%;
-        }
         .btn-primary {
             background-color: #198754;
             border-color: #198754;
@@ -123,7 +114,7 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
             <div class="position-sticky pt-3">
                 <div class="text-center mb-4">
                     <h5>DNSC E-Request System</h5>
-                    <p class="text-muted">Student Portal</p>
+                    <p class="text-muted">Alumni Portal</p>
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item"><a class="nav-link text-white" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
@@ -142,7 +133,7 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
             </div>
         </div>
 
-        <!-- Main -->
+        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="h2">Notifications</h1>
@@ -186,7 +177,7 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
                                     <div>
                                         <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal<?php echo $notification['id']; ?>">Delete</button>
 
-                                        <!-- Modal -->
+                                        <!-- Delete Single Modal -->
                                         <div class="modal fade" id="confirmDeleteModal<?php echo $notification['id']; ?>" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-sm modal-dialog-centered">
                                                 <div class="modal-content">
@@ -255,7 +246,6 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
     </div>
 </div>
 
-<!-- AJAX script to mark notification as read -->
 <script>
 $(document).ready(function () {
     $('.view-request').on('click', function (e) {

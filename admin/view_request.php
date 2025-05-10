@@ -8,6 +8,27 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = $_GET['id'];
 $message = '';
+$request_source = 'student';
+
+
+$check = $conn->prepare("SELECT id FROM requests WHERE id = ?");
+$check->bind_param("i", $id);
+$check->execute();
+$check->store_result();
+
+if ($check->num_rows === 0) {
+    $check = $conn->prepare("SELECT id FROM alumni_requests WHERE id = ?");
+    $check->bind_param("i", $id);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows === 0) {
+        redirect('dashboard.php');
+    } else {
+        $request_source = 'alumni';
+    }
+}
+$table = ($request_source === 'student') ? 'requests' : 'alumni_requests';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
@@ -16,11 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tracking_number = 'TR-' . date('Ymd') . '-' . $id . rand(1000, 9999);
         $pickup_datetime = $_POST['pickup_datetime'];
 
-        $stmt = $conn->prepare("UPDATE requests SET status = 'approved', tracking_number = ?, pickup_datetime = ? WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE {$table} SET status = 'approved', tracking_number = ?, pickup_datetime = ? WHERE id = ?");
         $stmt->bind_param("ssi", $tracking_number, $pickup_datetime, $id);
 
         if ($stmt->execute()) {
-            $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
+            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
             $user_id = $request['user_id'];
             $notification_message = "Your request (ID: $id) has been approved. Your tracking number is $tracking_number. Please pick up your document on $pickup_datetime.";
 
@@ -35,11 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif ($action === 'reject') {
         $reason = trim($_POST['rejection_reason'] ?? '');
-        $stmt = $conn->prepare("UPDATE requests SET status = 'rejected' WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE {$table} SET status = 'rejected' WHERE id = ?");
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {
-            $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
+            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
             $user_id = $request['user_id'];
             $notification_message = "Your request (ID: $id) has been rejected." . ($reason ? " Reason: $reason" : " Please contact the registrar for more information.");
 
@@ -53,11 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
     } elseif ($action === 'complete') {
-        $stmt = $conn->prepare("UPDATE requests SET status = 'completed' WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE {$table} SET status = 'completed' WHERE id = ?");
         $stmt->bind_param("i", $id);
 
         if ($stmt->execute()) {
-            $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
+            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
             $user_id = $request['user_id'];
             $notification_message = "Your request (ID: $id) has been completed and is ready for pickup.";
 
@@ -73,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'send_additional_note') {
         $additional_note = trim($_POST['additional_note']);
         if (!empty($additional_note)) {
-            $request = $conn->query("SELECT user_id FROM requests WHERE id = $id")->fetch_assoc();
+            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
             $user_id = $request['user_id'];
             $notification_message = "Update regarding your approved request (ID: $id): $additional_note";
 
@@ -92,10 +113,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch request details
 $stmt = $conn->prepare("
-SELECT r.*, u.full_name, u.email, u.stud_id 
-FROM requests r 
-JOIN users u ON r.user_id = u.id 
-WHERE r.id = ?
+    SELECT r.*, u.full_name, u.email, u.stud_id 
+    FROM {$table} r 
+    JOIN users u ON r.user_id = u.id 
+    WHERE r.id = ?
 ");
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -115,7 +136,11 @@ $request = $result->fetch_assoc();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .sidebar { min-height: 100vh; background-color: #2d5516; color: white; }
+        .sidebar {
+            min-height: 100vh;
+            background-color: #198754;
+            color: white;
+        }
         .nav-link { color: rgba(255,255,255,.8); }
         .nav-link:hover { color: white; }
         .nav-link.active { color: white; background-color: rgba(255,255,255,.2); }
@@ -125,6 +150,9 @@ $request = $result->fetch_assoc();
         .btn-outline-secondary { color: #498428; border-color: #498428; }
         .btn-outline-secondary:hover { background-color: #2d5516; border-color: #2d5516; color: white; }
         .card-header { background-color: #e9f7ef; border-bottom: 1px solid #d1e7dd; }
+        .view-row { margin-bottom: 10px; }
+        .view-label { font-weight: bold; display: inline-block; width: 180px; }
+        .view-value { display: inline-block; }
     </style>
 </head>
 <body>
@@ -143,7 +171,17 @@ $request = $result->fetch_assoc();
                     <li class="nav-item"><a class="nav-link" href="pending.php"><i class="fas fa-clock me-2"></i>Pending Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="approved.php"><i class="fas fa-check-circle me-2"></i>Approved Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="completed.php"><i class="fas fa-check-double me-2"></i>Completed Requests</a></li>
-                    <!-- <li class="nav-item mt-5"><a class="nav-link" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="registration_list.php">
+                            <i class="fas fa-user-check me-2"></i> Registration List
+                        </a>
+                    </li>
+                    <li class="nav-item mt-5">
+                        <a class="nav-link" href="../logout.php">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Logout
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -167,68 +205,35 @@ $request = $result->fetch_assoc();
                     <div class="card request-details-card mb-4">
                         <div class="card-header"><h5>Request Details</h5></div>
                         <div class="card-body">
-                            <h6><strong>User Information:</strong></h6>
-                            <div class="view-row">
-                                <span class="view-label">FullName:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['full_name']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">User:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['full_name']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">Email:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['email']); ?></span>
-                            </div>
+                          <p><strong>Full Name:</strong> <?= htmlspecialchars($request['full_name']) ?></p>
+                        <p><strong>Email:</strong> <?= htmlspecialchars($request['email']) ?></p>
+                        <p><strong>Student ID:</strong> <?= htmlspecialchars($request['stud_id']) ?></p>
+                        <p><strong>Request From:</strong> <?= ucfirst($request_source) ?></p>
+                        <p><strong>Institute:</strong> <?= htmlspecialchars($request['institute']) ?></p>
+                        <p><strong>Program:</strong> <?= htmlspecialchars($request['program']) ?></p>
 
-                            <div class="view-row">
-                                <span class="view-label">StudentID:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['stud_id']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">Institute:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['institute']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">Program:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['program']); ?></span>
-                            </div>
+                        <?php if ($request_source === 'student'): ?>
+                            <p><strong>Year Level:</strong> <?= htmlspecialchars($request['year_level']) ?></p>
+                            <p><strong>Semester:</strong> <?= htmlspecialchars($request['semester']) ?></p>
+                        <?php else: ?>
+                            <p><strong>User Type:</strong> Alumni</p>
+                        <?php endif; ?>
+<br>
+                        <h5>Request Information:</h5>
+                        <p><strong>Request Type:</strong> <?= htmlspecialchars($request['request_type']) ?></p>
+                        <p><strong>Request ID:</strong> <?= $request['id'] ?></p>
+                        <p><strong>Status:</strong> <?= htmlspecialchars($request['status']) ?></p>
 
-                            <div class="view-row">
-                                <span class="view-label">Year Level:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['year_level']); ?></span>
-                            </div>
+                        <?php if (!empty($request['tracking_number'])): ?>
+                            <p><strong>Tracking Number:</strong> <?= htmlspecialchars($request['tracking_number']) ?></p>
+                        <?php endif; ?>
 
-                            <div class="view-row">
-                                <span class="view-label">Semester:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['semester']); ?></span>
-                            </div>
-                            <br>
-                            <h6><strong>Request Information:</strong></h6>
-                            <div class="view-row">
-                                <span class="view-label">Request Type:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['request_type']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">Request ID:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['id']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">status:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['status']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">Tracking Number:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['tracking_number']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">Pickup Date/Time:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['pickup_datetime']); ?></span>
-                            </div>
-                            <div class="view-row">
-                                <span class="view-label">Details:</span>
-                                <span class="view-value"><?php echo htmlspecialchars($request['details']); ?></span>
-                            </div>
+                        <?php if (!empty($request['pickup_datetime'])): ?>
+                            <p><strong>Pickup Date/Time:</strong> <?= htmlspecialchars($request['pickup_datetime']) ?></p>
+                        <?php endif; ?>
+
+                        <p><strong>Details:</strong> <?= nl2br(htmlspecialchars($request['details'])) ?></p>
+
                         </div>
                     </div>
                 </div>
@@ -239,7 +244,6 @@ $request = $result->fetch_assoc();
                         <div class="card-header"><h5 class="mb-0">Actions</h5></div>
                         <div class="card-body">
                             <?php if ($request['status'] === 'pending'): ?>
-                                <!-- Approve -->
                                 <form method="POST" class="mb-3">
                                     <h6>Approve Request</h6>
                                     <div class="mb-3">
@@ -250,19 +254,15 @@ $request = $result->fetch_assoc();
                                     <button type="submit" class="btn btn-success"><i class="fas fa-check-circle me-1"></i> Approve</button>
                                 </form>
                                 <hr>
-                                <!-- Reject -->
                                 <h6>Reject Request</h6>
                                 <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="fas fa-times-circle me-1"></i> Reject</button>
-
                             <?php elseif ($request['status'] === 'approved'): ?>
-                                <!-- Additional Notification -->
                                 <form method="POST" class="mb-3">
                                     <h6>Send Additional Notification</h6>
                                     <textarea name="additional_note" class="form-control mb-2" rows="3" placeholder="Type message..."></textarea>
                                     <input type="hidden" name="action" value="send_additional_note">
                                     <button type="submit" class="btn btn-warning"><i class="fas fa-paper-plane me-1"></i> Send</button>
                                 </form>
-                                <!-- Complete -->
                                 <form method="POST">
                                     <input type="hidden" name="action" value="complete">
                                     <button type="submit" class="btn btn-primary"><i class="fas fa-check-double me-1"></i> Mark as Completed</button>
