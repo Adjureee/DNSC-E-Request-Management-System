@@ -2,22 +2,31 @@
 require_once '../config.php';
 checkAdminAuth();
 
-// Fetch all pending requests (including is_seen flag)
+// Fetch all pending requests (student + alumni)
 $stmt = $conn->prepare("
-    SELECT r.*, u.full_name 
-    FROM requests r 
-    JOIN users u ON r.user_id = u.id 
+    SELECT r.id, r.user_id, r.request_type, r.status, r.is_seen, r.created_at, u.full_name, 'student' AS role
+    FROM requests r
+    JOIN users u ON r.user_id = u.id
     WHERE r.status = 'pending'
-    ORDER BY r.created_at DESC
+    
+    UNION ALL
+    
+    SELECT ar.id, ar.user_id, ar.request_type, ar.status, ar.is_seen, ar.created_at, u.full_name, 'alumni' AS role
+    FROM alumni_requests ar
+    JOIN users u ON ar.user_id = u.id
+    WHERE ar.status = 'pending'
+    
+    ORDER BY created_at DESC
 ");
 $stmt->execute();
 $pendingRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-// Count how many are still unseen
+// Count unseen student + alumni requests
 $countStmt = $conn->prepare("
-    SELECT COUNT(*) AS unseen_count 
-    FROM requests 
-    WHERE status = 'pending' AND is_seen = 0
+    SELECT (
+        (SELECT COUNT(*) FROM requests WHERE status = 'pending' AND is_seen = 0) +
+        (SELECT COUNT(*) FROM alumni_requests WHERE status = 'pending' AND is_seen = 0)
+    ) AS unseen_count
 ");
 $countStmt->execute();
 $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
@@ -31,11 +40,11 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    .sidebar {
-      min-height: 100vh;
-      background-color: #2d5516;
-      color: white;
-    }
+     .sidebar {
+            min-height: 100vh;
+            background-color: #198754;
+            color: white;
+        }
     .nav-link {
       color: rgba(255,255,255,.8);
     }
@@ -59,30 +68,19 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
       border-color: #2d5516;
     }
     .sidebar .nav-link {
-    position: relative;
-}
-
-.sidebar .badge {
-    position: absolute;
-    top: 5px; 
-    right: 15px; 
-    background-color: red;
-    color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 50%;
-}
-.badge-notification {
-            position: absolute;
-            top: 5px;
-            right: 15px;
-            background-color: red;
-            color: white;
-            font-size: 0.6rem;
-            font-weight: 600;
-            padding: 2px 6px;
-            border-radius: 50%;
-        }
+      position: relative;
+    }
+    .badge-notification {
+      position: absolute;
+      top: 5px;
+      right: 15px;
+      background-color: red;
+      color: white;
+      font-size: 0.6rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>  
@@ -129,12 +127,17 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
               Completed Requests
             </a>
           </li>
-          <!-- <li class="nav-item mt-5">
-            <a class="nav-link" href="../logout.php">
-              <i class="fas fa-sign-out-alt me-2"></i>
-              Logout
-            </a>
-          </li> -->
+          <li class="nav-item">
+                        <a class="nav-link" href="registration_list.php">
+                            <i class="fas fa-user-check me-2"></i> Registration List
+                        </a>
+                    </li>
+           <li class="nav-item mt-5">
+                        <a class="nav-link" href="../logout.php">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Logout
+                        </a>
+                    </li>          
         </ul>
       </div>
     </div>
@@ -158,16 +161,17 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Student</th>
+                  <th>User</th>
                   <th>Type</th>
                   <th>Status</th>
                   <th>Created</th>
+                  <th>Role</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <?php if (empty($pendingRequests)): ?>
-                  <tr><td colspan="6" class="text-center py-4">No pending requests found</td></tr>
+                  <tr><td colspan="7" class="text-center py-4">No pending requests found</td></tr>
                 <?php else: ?>
                   <?php foreach ($pendingRequests as $r): ?>
                     <tr>
@@ -181,8 +185,9 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
                       <td><?php echo htmlspecialchars($r['request_type']); ?></td>
                       <td><span class="badge bg-warning"><?php echo ucfirst($r['status']); ?></span></td>
                       <td><?php echo date('M d, Y g:i A', strtotime($r['created_at'])); ?></td>
+                      <td><?php echo ucfirst($r['role']); ?></td>
                       <td>
-                        <a href="view_request.php?id=<?php echo $r['id']; ?>" class="btn btn-sm btn-primary">View</a>
+                        <a href="view_request.php?id=<?php echo $r['id']; ?>&role=<?php echo $r['role']; ?>" class="btn btn-sm btn-primary">View</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>

@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
             echo "<script>
                 setTimeout(() => { window.location.href = 'login.php'; }, 3000);
             </script>";
-            $success = "Registration successful! Redirecting to login in 3 seconds...";
+            $success = "Registration successful!";
         } else {
             $error = "Something went wrong. Please try again.";
         }
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                     <input type="password" name="confirm_password" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Upload Photo</label>
+                    <label>Upload IDPhoto</label>
                     <input type="file" name="photo" class="form-control-file" accept="image/*" onchange="previewPhoto(this)" required>
                     <img id="preview-img" class="img-thumbnail" onclick="openImageModal()" />
                 </div>

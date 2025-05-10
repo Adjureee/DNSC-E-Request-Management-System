@@ -2,32 +2,52 @@
 require_once '../config.php';
 checkAdminAuth();
 
-// Get statistics
-$result = $conn->query("SELECT COUNT(*) as total FROM requests");
-$totalRequests = $result->fetch_assoc()['total'];
+// Get statistics from both student and alumni requests
+function getRequestCount($conn, $status = null) {
+    $condition = $status ? "WHERE status = '$status'" : "";
+    $studentCount = $conn->query("SELECT COUNT(*) as count FROM requests $condition")->fetch_assoc()['count'];
+    $alumniCount = $conn->query("SELECT COUNT(*) as count FROM alumni_requests $condition")->fetch_assoc()['count'];
+    return $studentCount + $alumniCount;
+}
 
-$result = $conn->query("SELECT COUNT(*) as pending FROM requests WHERE status = 'pending'");
-$pendingRequests = $result->fetch_assoc()['pending'];
+$totalRequests = getRequestCount($conn);
+$pendingRequests = getRequestCount($conn, 'pending');
+$approvedRequests = getRequestCount($conn, 'approved');
+$completedRequests = getRequestCount($conn, 'completed');
 
-$result = $conn->query("SELECT COUNT(*) as approved FROM requests WHERE status = 'approved'");
-$approvedRequests = $result->fetch_assoc()['approved'];
-
-$result = $conn->query("SELECT COUNT(*) as completed FROM requests WHERE status = 'completed'");
-$completedRequests = $result->fetch_assoc()['completed'];
-
-$unseenStmt = $conn->prepare("SELECT COUNT(*) as unseen FROM requests WHERE status = 'pending' AND is_seen = 0");
+$unseenStmt = $conn->prepare("
+    SELECT 
+        (SELECT COUNT(*) FROM requests WHERE status = 'pending' AND is_seen = 0) +
+        (SELECT COUNT(*) FROM alumni_requests WHERE status = 'pending' AND is_seen = 0)
+        AS unseen
+");
 $unseenStmt->execute();
-$unseenResult = $unseenStmt->get_result();
-$unseenCount = $unseenResult->fetch_assoc()['unseen'];
+$unseenCount = $unseenStmt->get_result()->fetch_assoc()['unseen'];
 
-$stmt = $conn->query("
-    SELECT r.*, u.full_name 
+// Fetch latest 5 from students and 5 from alumni
+$studentRequests = $conn->query("
+    SELECT r.*, u.full_name, 'student' as source 
     FROM requests r 
     JOIN users u ON r.user_id = u.id 
     ORDER BY r.created_at DESC 
-    LIMIT 10
-");
-$latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
+    LIMIT 5
+")->fetch_all(MYSQLI_ASSOC);
+
+$alumniRequests = $conn->query("
+    SELECT r.*, u.full_name, 'alumni' as source 
+    FROM alumni_requests r 
+    JOIN users u ON r.user_id = u.id 
+    ORDER BY r.created_at DESC 
+    LIMIT 5
+")->fetch_all(MYSQLI_ASSOC);
+
+
+$latestRequests = array_merge($studentRequests, $alumniRequests);
+
+// Sort latestRequests by created_at descending
+usort($latestRequests, function($a, $b) {
+    return strtotime($b['created_at']) - strtotime($a['created_at']);
+});
 ?>
 
 <!DOCTYPE html>
@@ -102,20 +122,17 @@ $latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link active" href="dashboard.php">
-                            <i class="fas fa-tachometer-alt me-2"></i>
-                            Dashboard
+                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="requests.php">
-                            <i class="fas fa-clipboard-list me-2"></i>
-                            All Requests
+                            <i class="fas fa-clipboard-list me-2"></i> All Requests
                         </a>
                     </li>
                     <li class="nav-item position-relative">
                         <a class="nav-link" href="pending.php">
-                            <i class="fas fa-clock me-2"></i>
-                            Pending Requests
+                            <i class="fas fa-clock me-2"></i> Pending Requests
                             <?php if ($unseenCount > 0): ?>
                                 <span class="badge-notification"><?php echo $unseenCount; ?></span>
                             <?php endif; ?>
@@ -123,27 +140,22 @@ $latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="approved.php">
-                            <i class="fas fa-check-circle me-2"></i>
-                            Approved Requests
+                            <i class="fas fa-check-circle me-2"></i> Approved Requests
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="completed.php">
-                            <i class="fas fa-check-double me-2"></i>
-                            Completed Requests
+                            <i class="fas fa-check-double me-2"></i> Completed Requests
                         </a>
                     </li>
-                    <!-- New Registration List Nav Item -->
                     <li class="nav-item">
                         <a class="nav-link" href="registration_list.php">
-                            <i class="fas fa-user-check me-2"></i>
-                            Registration List
+                            <i class="fas fa-user-check me-2"></i> Registration List
                         </a>
                     </li>
                     <li class="nav-item mt-5">
                         <a class="nav-link" href="../logout.php">
-                            <i class="fas fa-sign-out-alt me-2"></i>
-                            Logout
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
                     </li>
                 </ul>
@@ -221,7 +233,7 @@ $latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Student</th>
+                                    <th>Submitted By</th>
                                     <th>Type</th>
                                     <th>Status</th>
                                     <th>Created</th>
@@ -232,21 +244,23 @@ $latestRequests = $stmt->fetch_all(MYSQLI_ASSOC);
                                 <?php foreach ($latestRequests as $request): ?>
                                 <tr>
                                     <td><?php echo $request['id']; ?></td>
-                                    <td><?php echo htmlspecialchars($request['full_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($request['full_name']) . ' (' . $request['source'] . ')'; ?></td>
                                     <td><?php echo htmlspecialchars($request['request_type']); ?></td>
                                     <td>
                                         <?php 
-                                        $statusClass = 'secondary';
-                                        if ($request['status'] == 'pending') $statusClass = 'warning';
-                                        if ($request['status'] == 'approved') $statusClass = 'info';
-                                        if ($request['status'] == 'completed') $statusClass = 'success';
-                                        if ($request['status'] == 'rejected') $statusClass = 'danger';
+                                        $statusClass = match($request['status']) {
+                                            'pending' => 'warning',
+                                            'approved' => 'info',
+                                            'completed' => 'success',
+                                            'rejected' => 'danger',
+                                            default => 'secondary',
+                                        };
                                         ?>
                                         <span class="badge bg-<?php echo $statusClass; ?>"><?php echo ucfirst($request['status']); ?></span>
                                     </td>
                                     <td><?php echo date('M d, Y g:i A', strtotime($request['created_at'])); ?></td>
                                     <td>
-                                        <a href="view_request.php?id=<?php echo $request['id']; ?>" class="btn btn-sm btn-primary">View</a>
+                                        <a href="view_request.php?id=<?php echo $request['id']; ?>&source=<?php echo $request['source']; ?>" class="btn btn-sm btn-primary">View</a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
