@@ -133,14 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                     <input type="password" name="confirm_password" class="form-control" required>
                 </div>
                 <div class="form-group">
-<<<<<<< HEAD
-                    <label>Upload Photo</label>
-                    <input type="file" name="photo" class="form-control-file" required>
-=======
                     <label>Upload IDPhoto</label>
                     <input type="file" name="photo" class="form-control-file" accept="image/*" onchange="previewPhoto(this)" required>
                     <img id="preview-img" class="img-thumbnail" onclick="openImageModal()" />
->>>>>>> pr/13/Duran
                 </div>
                 <div class="form-group">
                     <label>Status</label>
