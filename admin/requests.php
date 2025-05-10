@@ -113,6 +113,24 @@ usort($allRequests, function($a, $b) {
             <div class="card dashboard-card mb-4">
                 <div class="card-header"><h5 class="mb-0">All Requests</h5></div>
                 <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" id="requestSearch" class="form-control" placeholder="Search by ID, name, type or status...">
+                                <button class="btn btn-outline-success" type="button" id="searchBtn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-success filter-btn" data-filter="all">All</button>
+                                <button type="button" class="btn btn-outline-success filter-btn" data-filter="pending">Pending</button>
+                                <button type="button" class="btn btn-outline-success filter-btn" data-filter="approved">Approved</button>
+                                <button type="button" class="btn btn-outline-success filter-btn" data-filter="completed">Completed</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
                             <thead>
@@ -159,5 +177,32 @@ usort($allRequests, function($a, $b) {
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Client-side filtering
+    $("#requestSearch").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("table tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+    });
+    
+    // Status filtering
+    $(".filter-btn").click(function() {
+        var value = $(this).data('filter').toLowerCase();
+        
+        $(".filter-btn").removeClass("active");
+        $(this).addClass("active");
+        
+        if(value === 'all') {
+            $("table tbody tr").show();
+        } else {
+            $("table tbody tr").filter(function() {
+                $(this).toggle($(this).find("td:nth-child(5)").text().toLowerCase().indexOf(value) > -1)
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>

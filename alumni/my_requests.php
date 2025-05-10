@@ -140,6 +140,18 @@ $total_pages = ceil($total_records / $limit);
                     <div class="card-header">
                         <h5 class="mb-0">Request History</h5>
                     </div>
+                     </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <input type="text" id="requestSearch" class="form-control" placeholder="Search by type, status or tracking number...">
+                                    <button class="btn btn-outline-secondary" type="button">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
@@ -224,5 +236,15 @@ $total_pages = ceil($total_records / $limit);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+       <script>
+    $(document).ready(function() {
+        $("#requestSearch").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("table tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+    </script>
 </body>
 </html>
