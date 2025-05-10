@@ -231,7 +231,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
             <!-- Main content -->
             <main class="col-12 px-md-4 py-4" id="main-content">
-            <!-- <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom"> -->
+            <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="display-5">Student Dashboard</h1>
             </div>
            
