@@ -71,5 +71,5 @@ CREATE TABLE IF NOT EXISTS notifications (
 
 -- Insert default admin account
 INSERT INTO users (stud_id, password, email, full_name, verification_status, role) VALUES
-('admin001', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@dnsc.edu.ph', 'System Administrator', 'approved_student', 'admin');
+('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@dnsc.edu.ph', 'System Administrator', 'approved_student', 'admin');
 -- Note: Default password is 'password'

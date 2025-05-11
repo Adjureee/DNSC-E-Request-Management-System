@@ -70,19 +70,60 @@ function sanitize($data) {
     return $data;
 }
 
-// Function to get status badge class (with green color scheme)
-function getStatusBadgeClass($status) {
-    switch ($status) {
-        case 'pending':
-            return 'bg-success bg-opacity-75';
-        case 'approved':
-            return 'bg-success';
-        case 'completed':
-            return 'bg-success bg-opacity-50';
-        case 'rejected':
-            return 'bg-danger';
-        default:
-            return 'bg-secondary';
+/**
+ * Call a stored procedure with parameters
+ * 
+ * @param mysqli $conn Database connection
+ * @param string $procedure Procedure name  
+ * @param string $types Parameter types (i for integer, s for string, d for double)
+ * @param array $params Parameters array
+ * @return mysqli_result|bool Result object or boolean
+ */
+function callProcedure($conn, $procedure, $types = '', $params = []) {
+    // Handle empty parameters case
+    if (empty($params)) {
+        $query = "CALL $procedure()";
+        $stmt = $conn->prepare($query);
+    } else {
+        // Special case for sp_UpdateRequestStatus which needs 5 parameters
+        if ($procedure === 'sp_UpdateRequestStatus' && count($params) === 3) {
+            // When only status is being updated (without tracking number and pickup datetime)
+            // Add NULL values for missing parameters
+            $params[] = NULL;
+            $params[] = NULL;
+            $types .= 'ss'; // Add two string types for the NULL values
+            
+            $paramStr = str_repeat('?,', count($params) - 1) . '?';
+            $query = "CALL $procedure($paramStr)";
+            
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param($types, ...$params);
+        } else {
+            $paramStr = str_repeat('?,', count($params) - 1) . '?';
+            $query = "CALL $procedure($paramStr)";
+            
+            $stmt = $conn->prepare($query);
+            
+            if (!empty($types)) {
+                $stmt->bind_param($types, ...$params);
+            }
+        }
     }
+    
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    return $result;
+}
+
+// Helper function to get status badge class
+function getStatusBadgeClass($status) {
+    return match($status) {
+        'pending' => 'bg-warning text-dark',
+        'approved' => 'bg-info',
+        'completed' => 'bg-success',
+        'rejected' => 'bg-danger',
+        default => 'bg-secondary',
+    };
 }
 ?>

@@ -2,27 +2,15 @@
 require_once '../config.php';
 checkAdminAuth();
 
-// Get statistics from both student and alumni requests
-function getRequestCount($conn, $status = null) {
-    $condition = $status ? "WHERE status = '$status'" : "";
-    $studentCount = $conn->query("SELECT COUNT(*) as count FROM requests $condition")->fetch_assoc()['count'];
-    $alumniCount = $conn->query("SELECT COUNT(*) as count FROM alumni_requests $condition")->fetch_assoc()['count'];
-    return $studentCount + $alumniCount;
-}
+// Get dashboard statistics using stored procedure
+$result = callProcedure($conn, 'sp_GetAdminDashboardStats');
+$stats = $result->fetch_assoc();
 
-$totalRequests = getRequestCount($conn);
-$pendingRequests = getRequestCount($conn, 'pending');
-$approvedRequests = getRequestCount($conn, 'approved');
-$completedRequests = getRequestCount($conn, 'completed');
-
-$unseenStmt = $conn->prepare("
-    SELECT 
-        (SELECT COUNT(*) FROM requests WHERE status = 'pending' AND is_seen = 0) +
-        (SELECT COUNT(*) FROM alumni_requests WHERE status = 'pending' AND is_seen = 0)
-        AS unseen
-");
-$unseenStmt->execute();
-$unseenCount = $unseenStmt->get_result()->fetch_assoc()['unseen'];
+$totalRequests = $stats['total_requests'];
+$pendingRequests = $stats['pending_requests'];
+$approvedRequests = $stats['approved_requests'];
+$completedRequests = $stats['completed_requests'];
+$unseenCount = $stats['new_requests'];
 
 // Fetch latest 5 from students and 5 from alumni
 $studentRequests = $conn->query("

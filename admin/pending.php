@@ -197,7 +197,7 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
                       <td><?php echo date('M d, Y g:i A', strtotime($r['created_at'])); ?></td>
                       <td><?php echo ucfirst($r['role']); ?></td>
                       <td>
-                        <a href="view_request.php?id=<?php echo $r['id']; ?>&role=<?php echo $r['role']; ?>" class="btn btn-sm btn-primary">View</a>
+                        <a href="view_request.php?id=<?php echo $r['id']; ?>&source=<?php echo $r['role']; ?>" class="btn btn-sm btn-primary">View</a>
                       </td>
                     </tr>
                   <?php endforeach; ?>

@@ -158,7 +158,7 @@ usort($allRequests, function($a, $b) {
                                         </td>
                                         <td><?= date('M d, Y g:i A', strtotime($request['created_at'])); ?></td>
                                         <td>
-                                            <a href="view_request.php?id=<?= $request['id']; ?>" class="btn btn-sm btn-primary">View</a>
+                                            <a href="view_request.php?id=<?= $request['id']; ?>&source=<?= $request['source']; ?>" class="btn btn-sm btn-primary">View</a>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

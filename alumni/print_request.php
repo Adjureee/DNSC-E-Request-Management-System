@@ -10,7 +10,7 @@ $id = $_GET['id'];
 $user_id = $_SESSION['user_id'];
 
 
-$stmt = $conn->prepare("SELECT r.*, a.full_name, a.email FROM requests r JOIN alumni a ON r.user_id = a.id WHERE r.id = ? AND r.user_id = ?");
+$stmt = $conn->prepare("SELECT r.*, u.full_name, u.email FROM alumni_requests r JOIN users u ON r.user_id = u.id WHERE r.id = ? AND r.user_id = ?");
 $stmt->bind_param("ii", $id, $user_id);
 $stmt->execute();
 $result = $stmt->get_result();

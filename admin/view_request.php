@@ -8,27 +8,44 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = $_GET['id'];
 $message = '';
-$request_source = 'student';
 
+// Determine the request source (student or alumni)
+// Check if source is directly provided in the URL
+$request_source = isset($_GET['source']) ? $_GET['source'] : null;
 
-$check = $conn->prepare("SELECT id FROM requests WHERE id = ?");
-$check->bind_param("i", $id);
-$check->execute();
-$check->store_result();
-
-if ($check->num_rows === 0) {
-    $check = $conn->prepare("SELECT id FROM alumni_requests WHERE id = ?");
+// If source is not provided, try to determine it
+if (!$request_source) {
+    $check = $conn->prepare("SELECT id FROM requests WHERE id = ?");
     $check->bind_param("i", $id);
     $check->execute();
     $check->store_result();
 
     if ($check->num_rows === 0) {
-        redirect('dashboard.php');
+        $check = $conn->prepare("SELECT id FROM alumni_requests WHERE id = ?");
+        $check->bind_param("i", $id);
+        $check->execute();
+        $check->store_result();
+
+        if ($check->num_rows === 0) {
+            redirect('dashboard.php');
+        } else {
+            $request_source = 'alumni';
+        }
     } else {
-        $request_source = 'alumni';
+        $request_source = 'student';
     }
 }
-$table = ($request_source === 'student') ? 'requests' : 'alumni_requests';
+
+$table = $request_source; // Use the source directly as table name parameter
+
+// Fetch request details using stored procedure
+$result = callProcedure($conn, 'sp_GetRequestDetails', 'is', [$id, $table]);
+
+if ($result === false || $result->num_rows === 0) {
+    redirect('dashboard.php');
+}
+
+$request = $result->fetch_assoc();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
@@ -36,65 +53,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'approve') {
         $tracking_number = 'TR-' . date('Ymd') . '-' . $id . rand(1000, 9999);
         $pickup_datetime = $_POST['pickup_datetime'];
-
-        $stmt = $conn->prepare("UPDATE {$table} SET status = 'approved', tracking_number = ?, pickup_datetime = ? WHERE id = ?");
-        $stmt->bind_param("ssi", $tracking_number, $pickup_datetime, $id);
-
-        if ($stmt->execute()) {
-            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
-            $user_id = $request['user_id'];
-            $notification_message = "Your request (ID: $id) has been approved. Your tracking number is $tracking_number. Please pick up your document on $pickup_datetime.";
-
-            $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
-            $stmt->bind_param("is", $user_id, $notification_message);
-            $stmt->execute();
-
+        
+        // Use stored procedure to update status
+        $result = callProcedure($conn, 'sp_UpdateRequestStatus', 'issss', [
+            $id, 
+            $table, 
+            'approved', 
+            $tracking_number, 
+            $pickup_datetime
+        ]);
+        
+        if ($result !== false) {
+            $updated_request = $result->fetch_assoc();
             $message = "Request has been approved successfully.";
         } else {
             $message = "Error updating request: " . $conn->error;
         }
-
+        
     } elseif ($action === 'reject') {
         $reason = trim($_POST['rejection_reason'] ?? '');
-        $stmt = $conn->prepare("UPDATE {$table} SET status = 'rejected' WHERE id = ?");
-        $stmt->bind_param("i", $id);
-
-        if ($stmt->execute()) {
-            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
-            $user_id = $request['user_id'];
-            $notification_message = "Your request (ID: $id) has been rejected." . ($reason ? " Reason: $reason" : " Please contact the registrar for more information.");
-
-            $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
-            $stmt->bind_param("is", $user_id, $notification_message);
-            $stmt->execute();
-
+        
+        // Use stored procedure to update status
+        $result = callProcedure($conn, 'sp_UpdateRequestStatus', 'iss', [
+            $id, 
+            $table, 
+            'rejected'
+        ]);
+        
+        if ($result !== false) {
+            $updated_request = $result->fetch_assoc();
             $message = "Request has been rejected successfully.";
         } else {
             $message = "Error updating request: " . $conn->error;
         }
-
+        
     } elseif ($action === 'complete') {
-        $stmt = $conn->prepare("UPDATE {$table} SET status = 'completed' WHERE id = ?");
-        $stmt->bind_param("i", $id);
-
-        if ($stmt->execute()) {
-            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
-            $user_id = $request['user_id'];
-            $notification_message = "Your request (ID: $id) has been completed and is ready for pickup.";
-
-            $stmt = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
-            $stmt->bind_param("is", $user_id, $notification_message);
-            $stmt->execute();
-
+        // Use stored procedure to update status
+        $result = callProcedure($conn, 'sp_UpdateRequestStatus', 'iss', [
+            $id, 
+            $table, 
+            'completed'
+        ]);
+        
+        if ($result !== false) {
+            $updated_request = $result->fetch_assoc();
             $message = "Request has been marked as completed.";
         } else {
             $message = "Error updating request: " . $conn->error;
         }
-
+        
     } elseif ($action === 'send_additional_note') {
         $additional_note = trim($_POST['additional_note']);
         if (!empty($additional_note)) {
-            $request = $conn->query("SELECT user_id FROM {$table} WHERE id = $id")->fetch_assoc();
+            // Get user_id from request
             $user_id = $request['user_id'];
             $notification_message = "Update regarding your approved request (ID: $id): $additional_note";
 
@@ -105,28 +116,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $message = "Error sending update: " . $conn->error;
             }
+            $stmt->close();
         } else {
             $message = "Notification message cannot be empty.";
         }
     }
+    
+    // Refresh request data after any action
+    $result = callProcedure($conn, 'sp_GetRequestDetails', 'is', [$id, $table]);
+    if ($result !== false) {
+        $request = $result->fetch_assoc();
+    }
 }
-
-// Fetch request details
-$stmt = $conn->prepare("
-    SELECT r.*, u.full_name, u.email, u.stud_id 
-    FROM {$table} r 
-    JOIN users u ON r.user_id = u.id 
-    WHERE r.id = ?
-");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows === 0) {
-    redirect('dashboard.php');
-}
-
-$request = $result->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="en">
