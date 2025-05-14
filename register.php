@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     $pre_select_role = $_POST['pre_selected_role'];
-    $pre_select_role = $_POST['pre_selected_role'];
     $photo = $_FILES['photo'];
 
     $validationErrors = [];
@@ -70,11 +69,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     <title>Register - DNSC E-Request</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .register-container { max-width: 600px; margin: 50px auto; }
-        .card { border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .card-header { background-color: #198754; color: white; }
-        .btn-primary { width: 100%; background-color: #198754; }
+        body { 
+            background-color: #f8f9fa;
+        }
+        .register-container {
+             max-width: 600px;
+             margin: 50px auto;
+        }
+        .card { border-radius: 10px;
+             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .card-header { background-color: #198754;
+             color: white;
+        }
+        .btn-primary { width: 100%;
+             background-color: #198754;
+        }
+        #preview-img { 
+            max-height: 150px; cursor:pointer;
+            margin-top: 10px; display: none;
+        }
+        .modal-lg { 
+            max-width: 450px;
+        }
     </style>
 </head>
 <body>
