@@ -12,12 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
-    $pre_select_role = isset($_POST['pre_selected_role']) ? $_POST['pre_selected_role'] : '';
+    $pre_select_role = $_POST['pre_selected_role'];
     $photo = $_FILES['photo'];
 
     $validationErrors = [];
 
-    // Validate inputs
     if (empty($full_name)) $validationErrors[] = 'Full name is required.';
     if (empty($stud_id)) $validationErrors[] = 'Student ID is required.';
     if (empty($institute)) $validationErrors[] = 'Institute is required.';
@@ -28,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     if (empty($pre_select_role)) $validationErrors[] = 'Role is required.';
     if ($photo['error'] !== 0) $validationErrors[] = 'Photo upload failed.';
 
-    // Check if email exists
     $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -37,7 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     $stmt->close();
 
     if (empty($validationErrors)) {
-        // Upload photo
         $uploadDir = "uploads/";
         $photoName = uniqid() . '_' . basename($photo['name']);
         $targetFile = $uploadDir . $photoName;
@@ -45,17 +42,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
 
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Insert into users table
         $stmt = $conn->prepare("INSERT INTO users (stud_id, full_name, institute, program, email, password, uploadphoto, verification_status, pre_select_role, role, created_at) 
         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, NULL, NOW())");
-        $stmt->bind_param("ssssssss", $stud_id, $full_name, $institute, $program, $email, $hashed_password, $photoName, $pre_select_role);    
+        $stmt->bind_param("ssssssss", $stud_id, $full_name, $institute, $program, $email, $hashed_password, $photoName, $pre_select_role);
 
         if ($stmt->execute()) {
-            $success = "Registration successful! Please wait for admin verification.";
-
-            // Redirect to login page immediately after successful registration
-            header("Location: login.php");
-            exit(); // Make sure no further code is executed after the redirect
+            echo "<script>
+                setTimeout(() => { window.location.href = 'login.php'; }, 3000);
+            </script>";
+            $success = "Registration successful!";
         } else {
             $error = "Something went wrong. Please try again.";
         }
@@ -66,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
 }
 ?>
 
-<!-- HTML START -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -155,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                 <div class="alert alert-success"><?= $success ?></div>
             <?php endif; ?>
 
-            <form action="register.php" method="POST" enctype="multipart/form-data">
+            <form id="registerForm" action="register.php" method="POST" enctype="multipart/form-data" novalidate>
                 <div class="form-group">
                     <label>Fullname</label>
                     <input type="text" name="full_name" class="form-control" required>
@@ -193,8 +188,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                     <input type="password" name="confirm_password" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Upload Photo</label>
-                    <input type="file" name="photo" class="form-control-file" required>
+                    <label>Upload IDPhoto</label>
+                    <input type="file" name="photo" class="form-control-file" accept="image/*" onchange="previewPhoto(this)" required>
+                    <img id="preview-img" class="img-thumbnail" onclick="openImageModal()" />
                 </div>
                 <div class="form-group">
                     <label>Status</label>
@@ -205,9 +201,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                     </select>
                 </div>
 
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal">
-                    Confirm
-                </button>
+                <button type="button" class="btn btn-primary" onclick="validateAndShowModal()">Confirm</button>
+                <p class="text-center mt-2">Already have an account? <a href="login.php">Login</a></p>
 
                 <!-- Confirmation Modal -->
                 <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
@@ -217,12 +212,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
                                 <h5 class="modal-title">Confirm Submission</h5>
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                             </div>
-                            <div class="modal-body">
-                                Are you sure you want to submit this registration form?
-                            </div>
+                            <div class="modal-body">Are you sure you want to submit this registration form?</div>
                             <div class="modal-footer">
                                 <button type="submit" name="registerbtn" class="btn btn-success">Yes, Submit</button>
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Modal -->
+                <div class="modal fade" id="imageModal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Photo Preview</h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <img id="modal-img" src="" class="img-fluid" />
                             </div>
                         </div>
                     </div>
@@ -255,10 +263,36 @@ function updatePrograms() {
         });
     }
 }
+
+function validateAndShowModal() {
+    const form = document.getElementById('registerForm');
+    if (form.checkValidity()) {
+        $('#confirmModal').modal('show');
+    } else {
+        form.reportValidity();
+    }
+}
+
+function previewPhoto(input) {
+    const preview = document.getElementById('preview-img');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function openImageModal() {
+    const src = document.getElementById('preview-img').src;
+    document.getElementById('modal-img').src = src;
+    $('#imageModal').modal('show');
+}
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>

@@ -9,7 +9,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $id = $_GET['id'];
 $message = '';
 
-// Fetch user function
 function fetchUser($conn, $id) {
     $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
     $stmt->bind_param("i", $id);
@@ -22,7 +21,7 @@ if (!$user) {
     redirect('registration_list.php');
 }
 
-// Handle approval/rejection actions
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
@@ -42,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = 'Account has been rejected.';
     }
 
-    // Refresh user data after update
     $user = fetchUser($conn, $id);
 }
 
@@ -65,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         .photo-preview {
-            max-width: 200px;
+            max-width: 150px;
             border: 1px solid #ccc;
             border-radius: 6px;
         }
@@ -79,6 +77,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .action-buttons button:hover {
             transform: scale(1.05);
+        }
+        .modal-lg {
+            max-width: 450px;
+        }
+        .modal-white-bg .modal-content {
+            background-color: #ffffff;
+            border: none;
+            color: #000;
+            border-radius: 10px;
+        }
+        .modal-white-bg .btn-close {
+            filter: none;
         }
     </style>
 </head>
@@ -133,13 +143,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="mb-3">
-                <p class="info-label">Uploaded Photo:</p>
-                <?php if (!empty($user['uploadphoto'])): ?>
-                    <img src="../uploads/<?php echo htmlspecialchars($user['uploadphoto']); ?>" alt="User Photo" class="photo-preview">
-                <?php else: ?>
-                    <p class="text-muted">No photo uploaded.</p>
-                <?php endif; ?>
-            </div>
+    <p class="info-label">Uploaded Photo:</p>
+    <?php if (!empty($user['uploadphoto'])): ?>
+        <img src="../uploads/<?php echo htmlspecialchars($user['uploadphoto']); ?>" 
+             alt="User Photo" 
+             class="photo-preview" 
+             id="preview-img" 
+             data-bs-toggle="modal" 
+             data-bs-target="#photoModal">
+    <?php else: ?>
+        <p class="text-muted">No photo uploaded.</p>
+    <?php endif; ?>
+</div>
+
         </div>
     </div>
 
@@ -155,6 +171,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </button>
         </form>
     <?php endif; ?>
+</div>  
+
+<div class="modal fade modal-dark-bg" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="../uploads/<?php echo htmlspecialchars($user['uploadphoto']); ?>" 
+             alt="Full Preview" 
+             class="img-fluid rounded">
+      </div>
+    </div>
+  </div>
 </div>
+
+
 </body>
 </html>

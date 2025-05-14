@@ -9,7 +9,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $id = $_GET['id'];
 $user_id = $_SESSION['user_id'];
 
-// Get request details - make sure it belongs to the current user
+
 $stmt = $conn->prepare("SELECT * FROM requests WHERE id = ? AND user_id = ?");
 $stmt->bind_param("ii", $id, $user_id);
 $stmt->execute();
@@ -136,9 +136,6 @@ $request = $result->fetch_assoc();
                                 <i class="fas fa-bell me-2"></i>
                                 Notifications
                             </a>
-                        </li>
-                        <!-- Logout removed from sidebar -->
-                    </ul>
                 </div>
             </div>
 
