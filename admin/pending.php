@@ -94,51 +94,63 @@ $unseenCount = $countStmt->get_result()->fetch_assoc()['unseen_count'];
           <p class="text-white">Admin Panel</p>
         </div>
         <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link" href="dashboard.php">
-              <i class="fas fa-tachometer-alt me-2"></i>
-              Dashboard
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="requests.php">
-              <i class="fas fa-clipboard-list me-2"></i>
-              All Requests
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="pending.php">
-             <i class="fas fa-clock me-2"></i>
-             Pending Requests
-              <?php if($unseenCount): ?>
-                <span class="badge-notification"><?php echo $unseenCount; ?></span>
-              <?php endif; ?>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="approved.php">
-              <i class="fas fa-check-circle me-2"></i>
-              Approved Requests
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="completed.php">
-              <i class="fas fa-check-double me-2"></i>
-              Completed Requests
-            </a>
-          </li>
-          <li class="nav-item">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.php">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="requests.php">
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            All Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="pending.php">
+                            <i class="fas fa-clock me-2"></i>
+                            Pending Requests
+                            <?php if($unseenCount): ?>
+                                <span class="badge-notification"><?php echo $unseenCount; ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="approved.php">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Approved Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="completed.php">
+                            <i class="fas fa-check-double me-2"></i>
+                            Completed Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="registration_list.php">
                             <i class="fas fa-user-check me-2"></i> Registration List
                         </a>
                     </li>
-           <li class="nav-item mt-5">
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_notifications.php">
+                            <i class="fas fa-bell me-2"></i> Notifications
+                            <?php
+                            // Get notification count
+                            $notifCountQuery = $conn->query("SELECT COUNT(*) as count FROM admin_notifications WHERE is_read = 0");
+                            $notifCount = $notifCountQuery->fetch_assoc()['count'];
+                            if($notifCount > 0): ?>
+                                <span class="badge bg-danger rounded-pill position-absolute top-50 end-0 translate-middle-y me-3"><?php echo $notifCount; ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                    <li class="nav-item mt-5">
                         <a class="nav-link" href="../logout.php">
                             <i class="fas fa-sign-out-alt me-2"></i>
                             Logout
                         </a>
                     </li>          
-        </ul>
+                </ul>
       </div>
     </div>
 

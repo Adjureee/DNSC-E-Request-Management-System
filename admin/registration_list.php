@@ -77,6 +77,18 @@ if (isset($_GET['status'])) {
                     <li class="nav-item"><a class="nav-link" href="approved.php"><i class="fas fa-check-circle me-2"></i> Approved Requests</a></li>
                     <li class="nav-item"><a class="nav-link" href="completed.php"><i class="fas fa-check-double me-2"></i> Completed Requests</a></li>
                     <li class="nav-item"><a class="nav-link active" href="registration_list.php"><i class="fas fa-user-check me-2"></i> Registration List</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_notifications.php">
+                            <i class="fas fa-bell me-2"></i> Notifications
+                            <?php
+                            // Get notification count
+                            $notifCountQuery = $conn->query("SELECT COUNT(*) as count FROM admin_notifications WHERE is_read = 0");
+                            $notifCount = $notifCountQuery->fetch_assoc()['count'];
+                            if($notifCount > 0): ?>
+                                <span class="badge bg-danger rounded-pill position-absolute top-50 end-0 translate-middle-y me-3"><?php echo $notifCount; ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
                     <li class="nav-item mt-5"><a class="nav-link" href="../logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                 </ul>
             </div>
