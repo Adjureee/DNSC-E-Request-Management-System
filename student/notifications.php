@@ -67,6 +67,11 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <style>
+         :root {
+            --primary: #2d5516;
+            --secondary: #C1D95C;
+            --tertiary: #498428;
+        }
         .sidebar {
             min-height: 100vh;
             background-color: #2d5516;
@@ -98,6 +103,16 @@ $unread_count = $stmt->get_result()->fetch_assoc()['unread'];
         .btn-primary:hover {
             background-color: #146c43;
             border-color: #146c43;
+        }
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary:hover {
+            background-color:var(--tertiary);
+            border-color: #2d5516;
+            color: white;
         }
         .btn-outline-secondary {
             color: #198754;

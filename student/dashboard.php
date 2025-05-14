@@ -96,6 +96,16 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             border-color: #badbcc;
             color: #498428;
         }
+        /* Adjust layout when sidebar is hidden */
+        .sidebar-collapsed #sidebarMenu {
+            display: none;
+        }
+
+        .sidebar-collapsed #main-content {
+            margin-left: 0 !important;
+            width: 100%;
+        }
+
         /* #sidebarToggle {
             position: fixed;
             top: 15px;
@@ -220,10 +230,11 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <!-- Main content -->
-            <main class="col-12 px-md-4 py-4" id="mainContent">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Student Dashboard</h1>
-                </div>
+            <main class="col-12 px-md-4 py-4" id="main-content">
+            <div class="d-flex justify-content-center align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="display-5">Student Dashboard</h1>
+            </div>
+           
 
                 <!-- Notifications -->
                 <?php if (count($notifications) > 0): ?>
@@ -238,7 +249,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 <!-- Stats Cards -->
                 <div class="row my-4">
                     <div class="col-md-3 mb-4">
-                    <div class="card dashboard-card" style="background-color: #2d5516; color: white;">
+                    <div class="card dashboard-card" style="background-color: #2c5315; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Total Requests</h5>
@@ -249,7 +260,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                     </div>
                     <div class="col-md-3 mb-4">
-                        <div class="card dashboard-card" style="background-color: #498428; color: white;">
+                        <div class="card dashboard-card" style="background-color: #478026; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Pending</h5>
@@ -260,7 +271,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                     </div>
                     <div class="col-md-3 mb-4">
-                        <div class="card dashboard-card" style="background-color: #749E35; color: white;">
+                        <div class="card dashboard-card" style="background-color: #6f9733; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Approved</h5>
@@ -271,7 +282,7 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                     </div>
                     <div class="col-md-3 mb-4">
-                        <div class="card dashboard-card" style="background-color: #B3CC50; color: white;">
+                        <div class="card dashboard-card" style="background-color: #b3cc50; color: white;">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <div>
                                     <h5 class="card-title">Completed</h5>
@@ -381,19 +392,19 @@ $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     
     <script>
     document.getElementById('sidebarToggleTop').addEventListener('click', function () {
-        var sidebar = document.getElementById('sidebarMenu');
-        var main = document.getElementById('mainContent');
+    var sidebar = document.getElementById('sidebarMenu');
+    var main = document.getElementById('main-content'); // <-- corrected ID
 
-        sidebar.classList.toggle('show');
+    sidebar.classList.toggle('show');
 
-        if (sidebar.classList.contains('show')) {
-            main.classList.remove('col-12');
-            main.classList.add('col-md-9', 'col-lg-10');
-        } else {
-            main.classList.remove('col-md-9', 'col-lg-10');
-            main.classList.add('col-12');
-        }
-    });
+    if (sidebar.classList.contains('show')) {
+        main.classList.remove('col-12');
+        main.classList.add('col-md-9', 'col-lg-10');
+    } else {
+        main.classList.remove('col-md-9', 'col-lg-10');
+        main.classList.add('col-12');
+    }
+});
 </script>
 
 

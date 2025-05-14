@@ -23,6 +23,12 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <style>
+        :root {
+            --primary: #b3cc50;
+            --secondary: #6f9733;
+            --tertiary: #478026;
+            --quaternary: #2c5315;
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
@@ -42,7 +48,6 @@ if (isset($_SESSION['user_id'])) {
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
             background: #2d5516 !important;
         }
-        
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
@@ -51,22 +56,18 @@ if (isset($_SESSION['user_id'])) {
             transition: transform 0.3s ease;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
-        
         .navbar-brand:hover {
             transform: translateY(-2px);
         }
-        
         .navbar-brand img {
             height: 40px;
             margin-right: 10px;
             filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
         }
-        
         .nav-item {
             margin: 0 5px;
             position: relative;
         }
-        
         .nav-link {
             font-weight: 500;
             padding: 10px 15px !important;
@@ -262,7 +263,7 @@ if (isset($_SESSION['user_id'])) {
         /* How It Works Section */
         .step-item {
             position: relative;
-            padding-bottom: 1.5rem;
+            padding-bottom: 1.5rem ;
         }
         
         .step-item:not(:last-child)::after {
@@ -276,16 +277,16 @@ if (isset($_SESSION['user_id'])) {
         }
         
         .step-circle {
-            background-color: #388e3c;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #2e7d32; /* green */
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(56, 142, 60, 0.3);
+            font-size: 18px;
+            flex-shrink: 0;
         }
-        
         /* Button Styling */
         .btn-success {
             background-color: #388e3c;
