@@ -229,7 +229,7 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                         </a>
                     </li>
                     <li class="nav-item mt-5">
-                        <a class="nav-link" href="../logout.php">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
                             <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
                     </li>
@@ -456,6 +456,25 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                 </div>
             </div>
         </main>
+    </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="logoutModalLabel">Confirm Logout</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Kamo ba jud arjean n chan?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="../logout.php" class="btn btn-danger">Yes, Logout</a>
+            </div>
+        </div>
     </div>
 </div>
 
