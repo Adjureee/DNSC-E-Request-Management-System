@@ -261,6 +261,24 @@ END$$
 
 DELIMITER ;
 
+CREATE PROCEDURE `sp_GetActiveAnnouncementForUser` (IN `p_user_id` INT)
+BEGIN
+    SELECT a.*
+    FROM announcements a
+    WHERE a.is_active = 1
+      AND NOW() BETWEEN a.start_date AND a.end_date
+      AND NOT EXISTS (
+          SELECT 1
+          FROM announcement_views av
+          WHERE av.announcement_id = a.id AND av.user_id = p_user_id
+      )
+    ORDER BY a.start_date DESC
+    LIMIT 1;
+END$$
+
+DELIMITER ;
+
+
 -- --------------------------------------------------------
 
 --
@@ -350,9 +368,44 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `details` TEXT NOT NULL,
+  `photo` VARCHAR(255) DEFAULT NULL,
+  `is_active` TINYINT(1) DEFAULT 1,
+  `start_date` DATETIME NOT NULL,
+  `end_date` DATETIME NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcement_views`
+--
+CREATE TABLE `announcement_views` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `announcement_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `viewed_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_view` (`announcement_id`, `user_id`),
+  FOREIGN KEY (`announcement_id`) REFERENCES `announcements`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 --
 -- Dumping data for table `users`
 --
+
 
 INSERT INTO `users` (`id`, `stud_id`, `full_name`, `institute`, `program`, `email`, `password`, `role`, `pre_select_role`, `uploadphoto`, `verification_status`, `rejection_reason`, `approved_at`, `rejected_at`, `created_at`) VALUES
 (1, 'admin', 'System Administrator', NULL, NULL, 'admin@dnsc.edu.ph', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', NULL, NULL, 'approved_student', NULL, NULL, NULL, '2025-05-11 06:00:19'),
