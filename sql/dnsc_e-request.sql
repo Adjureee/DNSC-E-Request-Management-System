@@ -21,6 +21,45 @@ SET time_zone = "+00:00";
 -- Database: `dnsc_e-request`
 --
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for system settings (MOVED UP)
+--
+
+CREATE TABLE `system_settings` (
+  `id` int NOT NULL,
+  `setting_key` varchar(50) NOT NULL,
+  `setting_value` text,
+  `new_requests_count` int DEFAULT '0',
+  `new_registrations_count` int DEFAULT '0',
+  `last_updated` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `system_settings`
+--
+
+INSERT INTO `system_settings` (`id`, `setting_key`, `setting_value`, `new_requests_count`, `new_registrations_count`) VALUES
+(1, 'system_name', 'DNSC E-Request Management System', 0, 0);
+
+--
+-- Table structure for admin_notifications (MOVED UP)
+--
+
+CREATE TABLE `admin_notifications` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `message` text NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `request_id` int DEFAULT NULL,
+  `request_type` varchar(20) DEFAULT NULL,
+  `is_read` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_admin_notif_is_read` (`is_read`),
+  KEY `idx_admin_notif_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 DELIMITER $$
 --
 -- Procedures
@@ -33,7 +72,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_CreateAlumniRequest` (IN `p_user
     );
     
     -- Update the new requests counter
-    UPDATE system_settings SET new_requests_count = new_requests_count + 1;
+    UPDATE system_settings SET new_requests_count = new_requests_count + 1 WHERE id = 1;
     
     -- Return the created request ID
     SELECT LAST_INSERT_ID() AS request_id;
@@ -397,6 +436,13 @@ ALTER TABLE `users`
   ADD KEY `idx_users_email` (`email`);
 
 --
+-- Indexes for table `system_settings`
+--
+ALTER TABLE `system_settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `setting_key` (`setting_key`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -425,26 +471,97 @@ ALTER TABLE `users`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- Constraints for dumped tables
+-- AUTO_INCREMENT for table `system_settings`
 --
+ALTER TABLE `system_settings`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- Constraints for table `alumni_requests`
+-- Triggers for request management
 --
-ALTER TABLE `alumni_requests`
-  ADD CONSTRAINT `alumni_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
---
--- Constraints for table `notifications`
---
-ALTER TABLE `notifications`
-  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+DELIMITER $$
 
---
--- Constraints for table `requests`
---
-ALTER TABLE `requests`
-  ADD CONSTRAINT `requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+-- Trigger: When a student creates a new request
+CREATE TRIGGER tr_student_request_insert
+AFTER INSERT ON requests
+FOR EACH ROW
+BEGIN
+    -- Update system settings counter
+    UPDATE system_settings SET new_requests_count = new_requests_count + 1 WHERE id = 1;
+    
+    -- Create notification for admin
+    INSERT INTO admin_notifications (message, request_id, request_type, created_at)
+    VALUES (CONCAT('New student request from ID: ', NEW.user_id), NEW.id, 'student_request', NOW());
+END$$
+
+-- Trigger: When an alumni creates a new request
+CREATE TRIGGER tr_alumni_request_insert
+AFTER INSERT ON alumni_requests
+FOR EACH ROW
+BEGIN
+    -- Update system settings counter
+    UPDATE system_settings SET new_requests_count = new_requests_count + 1 WHERE id = 1;
+    
+    -- Create notification for admin
+    INSERT INTO admin_notifications (message, request_id, request_type, created_at)
+    VALUES (CONCAT('New alumni request from ID: ', NEW.user_id), NEW.id, 'alumni_request', NOW());
+END$$
+
+-- Trigger: When a student request status changes
+CREATE TRIGGER tr_student_request_status_update
+AFTER UPDATE ON requests
+FOR EACH ROW
+BEGIN
+    -- Check if status changed
+    IF NEW.status != OLD.status THEN
+        -- Create notification for user
+        INSERT INTO notifications (user_id, message, is_read, created_at)
+        VALUES (
+            NEW.user_id, 
+            CONCAT('Your request for ', NEW.request_type, ' has been updated to: ', UPPER(NEW.status)),
+            0,
+            NOW()
+        );
+    END IF;
+END$$
+
+-- Trigger: When an alumni request status changes
+CREATE TRIGGER tr_alumni_request_status_update
+AFTER UPDATE ON alumni_requests
+FOR EACH ROW
+BEGIN
+    -- Check if status changed
+    IF NEW.status != OLD.status THEN
+        -- Create notification for user
+        INSERT INTO notifications (user_id, message, is_read, created_at)
+        VALUES (
+            NEW.user_id, 
+            CONCAT('Your request for ', NEW.request_type, ' has been updated to: ', UPPER(NEW.status)),
+            0,
+            NOW()
+        );
+    END IF;
+END$$
+
+-- Trigger: User registration tracking
+CREATE TRIGGER tr_user_registration
+AFTER INSERT ON users
+FOR EACH ROW
+BEGIN
+    -- Check if not an admin account
+    IF NEW.role IS NULL OR NEW.role != 'admin' THEN
+        -- Update system settings counter for new registrations
+        UPDATE system_settings SET new_registrations_count = new_registrations_count + 1 WHERE id = 1;
+        
+        -- Create admin notification
+        INSERT INTO admin_notifications (message, user_id, request_type, created_at)
+        VALUES (CONCAT('New user registration: ', NEW.full_name), NEW.id, 'registration', NOW());
+    END IF;
+END$$
+
+DELIMITER ;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

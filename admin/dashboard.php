@@ -12,6 +12,31 @@ $approvedRequests = $stats['approved_requests'];
 $completedRequests = $stats['completed_requests'];
 $unseenCount = $stats['new_requests'];
 
+// Get system settings (triggers)
+$settingsQuery = $conn->query("SELECT new_requests_count, new_registrations_count FROM system_settings WHERE id = 1");
+$systemCounters = $settingsQuery->fetch_assoc();
+$newRequestsCount = $systemCounters['new_requests_count'] ?? 0;
+$newRegistrationsCount = $systemCounters['new_registrations_count'] ?? 0;
+
+// Get admin notifs (triggers)
+$adminNotificationsQuery = $conn->query("
+    SELECT * FROM admin_notifications 
+    WHERE is_read = 0 
+    ORDER BY created_at DESC 
+    LIMIT 5
+");
+$adminNotifications = $adminNotificationsQuery->fetch_all(MYSQLI_ASSOC);
+$notificationCount = count($adminNotifications);
+
+// Get notification summary by type (from triggers)
+$notifTypeQuery = $conn->query("
+    SELECT request_type, COUNT(*) as count
+    FROM admin_notifications
+    WHERE is_read = 0
+    GROUP BY request_type
+");
+$notificationTypes = $notifTypeQuery->fetch_all(MYSQLI_ASSOC);
+
 // Fetch latest 5 from students and 5 from alumni
 $studentRequests = $conn->query("
     SELECT r.*, u.full_name, 'student' as source 
@@ -29,13 +54,20 @@ $alumniRequests = $conn->query("
     LIMIT 5
 ")->fetch_all(MYSQLI_ASSOC);
 
-
-$latestRequests = array_merge($studentRequests, $alumniRequests);
-
 // Sort latestRequests by created_at descending
+$latestRequests = array_merge($studentRequests, $alumniRequests);
 usort($latestRequests, function($a, $b) {
     return strtotime($b['created_at']) - strtotime($a['created_at']);
 });
+
+// Mark admin notifications as read
+if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
+    $conn->query("UPDATE admin_notifications SET is_read = 1 WHERE is_read = 0");
+    // Reset the counter in system_settings
+    $conn->query("UPDATE system_settings SET new_requests_count = 0, new_registrations_count = 0 WHERE id = 1");
+    header('Location: dashboard.php');
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -94,6 +126,49 @@ usort($latestRequests, function($a, $b) {
             font-weight: 600;
             padding: 2px 6px;
             border-radius: 50%;
+        }
+        
+        /* Notification dropdown styles */
+        .notification-dropdown {
+            min-width: 320px;
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .notification-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            transition: background-color 0.2s ease;
+        }
+        .notification-item:hover {
+            background-color: #f1f1f1;
+        }
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        .notification-item .notification-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        .notification-footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .notification-badge {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            padding: 0.25rem 0.6rem;
         }
     </style>
 </head>
@@ -156,6 +231,56 @@ usort($latestRequests, function($a, $b) {
                 <h1 class="h2">Admin Dashboard</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
+                        <div class="dropdown me-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell me-1"></i> Notifications
+                                <?php if($notificationCount > 0): ?>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                                        <?php echo $notificationCount; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+                                <div class="notification-header">
+                                    <strong>Notifications</strong>
+                                    <?php if($notificationCount > 0): ?>
+                                        <a href="?mark_read=all" class="text-decoration-none small">Mark all as read</a>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <?php if(empty($adminNotifications)): ?>
+                                    <div class="notification-item">
+                                        <span class="text-muted">No new notifications</span>
+                                    </div>
+                                <?php else: ?>
+                                    <?php foreach($adminNotifications as $notification): ?>
+                                        <div class="notification-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <strong>
+                                                    <?php if($notification['request_type'] == 'registration'): ?>
+                                                        <i class="fas fa-user-plus text-primary me-1"></i>
+                                                    <?php elseif($notification['request_type'] == 'student_request'): ?>
+                                                        <i class="fas fa-file-alt text-success me-1"></i>
+                                                    <?php elseif($notification['request_type'] == 'alumni_request'): ?>
+                                                        <i class="fas fa-user-graduate text-info me-1"></i>
+                                                    <?php endif; ?>
+                                                    <?php echo $notification['request_type']; ?>
+                                                </strong>
+                                                <small class="notification-time">
+                                                    <?php echo date('M d, g:i A', strtotime($notification['created_at'])); ?>
+                                                </small>
+                                            </div>
+                                            <div><?php echo $notification['message']; ?></div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                                
+                                <div class="notification-footer">
+                                    <a href="admin_notifications.php" class="text-decoration-none">View all notifications</a>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <span class="btn btn-sm btn-outline-secondary">Welcome, <?php echo $_SESSION['full_name']; ?></span>
                     </div>
                 </div>
@@ -172,8 +297,14 @@ usort($latestRequests, function($a, $b) {
                             </div>
                             <i class="fas fa-clipboard-list fa-3x"></i>
                         </div>
+                        <?php if($newRequestsCount > 0): ?>
+                        <div class="card-footer bg-success-dark text-white py-1">
+                            <small><i class="fas fa-arrow-up me-1"></i> <?php echo $newRequestsCount; ?> new requests</small>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
+                
                 <div class="col-md-3 mb-4">
                     <div class="card dashboard-card" style="background-color: #20c997; color: white;">
                         <div class="card-body d-flex justify-content-between align-items-center">
@@ -183,8 +314,14 @@ usort($latestRequests, function($a, $b) {
                             </div>
                             <i class="fas fa-clock fa-3x"></i>
                         </div>
+                        <?php if($unseenCount > 0): ?>
+                        <div class="card-footer bg-info-dark text-white py-1">
+                            <small><i class="fas fa-bell me-1"></i> <?php echo $unseenCount; ?> unseen requests</small>
+                        </div>
+                        <?php endif; ?>
                     </div>
                 </div>
+                
                 <div class="col-md-3 mb-4">
                     <div class="card dashboard-card" style="background-color: #2dd4bf; color: white;">
                         <div class="card-body d-flex justify-content-between align-items-center">
@@ -196,6 +333,7 @@ usort($latestRequests, function($a, $b) {
                         </div>
                     </div>
                 </div>
+                
                 <div class="col-md-3 mb-4">
                     <div class="card dashboard-card" style="background-color: #15803d; color: white;">
                         <div class="card-body d-flex justify-content-between align-items-center">
@@ -204,6 +342,91 @@ usort($latestRequests, function($a, $b) {
                                 <h3 class="mb-0"><?php echo $completedRequests; ?></h3>
                             </div>
                             <i class="fas fa-check-double fa-3x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trigger Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">System Activity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                        <div>
+                                            <h6 class="mb-0">New Requests</h6>
+                                            <h4 class="mb-0"><?php echo $newRequestsCount; ?></h4>
+                                        </div>
+                                        <div class="bg-success text-white p-3 rounded">
+                                            <i class="fas fa-file-alt fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                        <div>
+                                            <h6 class="mb-0">New Registrations</h6>
+                                            <h4 class="mb-0"><?php echo $newRegistrationsCount; ?></h4>
+                                        </div>
+                                        <div class="bg-primary text-white p-3 rounded">
+                                            <i class="fas fa-user-plus fa-2x"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h6>Notification Summary</h6>
+                                <ul class="list-group">
+                                    <?php foreach($notificationTypes as $type): ?>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <?php echo ucfirst(str_replace('_', ' ', $type['request_type'])); ?>
+                                        <span class="badge bg-primary rounded-pill"><?php echo $type['count']; ?></span>
+                                    </li>
+                                    <?php endforeach; ?>
+                                    <?php if(empty($notificationTypes)): ?>
+                                    <li class="list-group-item text-muted">No notifications</li>
+                                    <?php endif; ?>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <!-- Recent activity log from triggers -->
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Recent Activity</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                <?php foreach($adminNotifications as $notification): ?>
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between">
+                                        <?php if($notification['request_type'] == 'registration'): ?>
+                                            <span><i class="fas fa-user-plus text-primary me-2"></i> <?php echo $notification['message']; ?></span>
+                                        <?php elseif($notification['request_type'] == 'student_request'): ?>
+                                            <span><i class="fas fa-file-alt text-success me-2"></i> <?php echo $notification['message']; ?></span>
+                                        <?php elseif($notification['request_type'] == 'alumni_request'): ?>
+                                            <span><i class="fas fa-user-graduate text-info me-2"></i> <?php echo $notification['message']; ?></span>
+                                        <?php endif; ?>
+                                        <small class="text-muted"><?php echo date('M d, g:i A', strtotime($notification['created_at'])); ?></small>
+                                    </div>
+                                </li>
+                                <?php endforeach; ?>
+                                <?php if(empty($adminNotifications)): ?>
+                                <li class="list-group-item text-center py-3 text-muted">No recent activity</li>
+                                <?php endif; ?>
+                            </ul>
+                            <div class="card-footer text-center py-2">
+                                <a href="admin_notifications.php" class="text-decoration-none">View all activity</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -268,5 +491,25 @@ usort($latestRequests, function($a, $b) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Notification badge auto-refresh
+    $(document).ready(function() {
+        // Check for new notifications every 30 seconds
+        setInterval(function() {
+            $.ajax({
+                url: 'check_notifications.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if(data.count > 0) {
+                        $('.notification-badge').text(data.count).show();
+                    } else {
+                        $('.notification-badge').hide();
+                    }
+                }
+            });
+        }, 30000);
+    });
+</script>
 </body>
 </html>

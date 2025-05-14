@@ -2,7 +2,7 @@
 require_once '../config.php';
 checkStudentAuth();
 
-// Get statistics for dashboard using stored procedure
+// Get stats for using stored procedure on dashbord
 $user_id = $_SESSION['user_id'];
 
 $result = callProcedure($conn, 'sp_GetUserRequestsStats', 'i', [$user_id]);
@@ -14,7 +14,7 @@ $approvedRequests = $stats['approved_requests'];
 $completedRequests = $stats['completed_requests'];
 $unreadNotifications = $stats['unread_notifications'];
 
-// Get notifications
+// Get notifications (these can be triggered from backend)
 $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -23,6 +23,42 @@ $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 // Get latest requests using stored procedure
 $result = callProcedure($conn, 'sp_GetUserRecentRequests', 'ii', [$user_id, 5]);
 $latestRequests = $result->fetch_all(MYSQLI_ASSOC);
+
+// Real-time notifications using trigger system
+$notificationsHTML = '';
+foreach ($notifications as $notification) {
+    $timeAgo = getTimeAgo($notification['created_at']);
+    $notificationsHTML .= '
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">New Notification</strong>
+                <small>'.$timeAgo.'</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                '.$notification['message'].'
+            </div>
+        </div>
+    </div>';
+}
+
+// Helper function to get time ago
+function getTimeAgo($timestamp) {
+    $time = strtotime($timestamp);
+    $now = time();
+    $diff = $now - $time;
+    
+    if ($diff < 60) {
+        return "Just now";
+    } elseif ($diff < 3600) {
+        return floor($diff/60) . " minutes ago";
+    } elseif ($diff < 86400) {
+        return floor($diff/3600) . " hours ago";
+    } else {
+        return floor($diff/86400) . " days ago";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -129,9 +165,22 @@ $latestRequests = $result->fetch_all(MYSQLI_ASSOC);
             margin-left: 0 !important;
         } */
 
+        /* Toast notification styling */
+        .toast {
+            max-width: 350px;
+            background-color: #fff;
+            border-left: 4px solid #198754;
+        }
+        .toast-header {
+            background-color: #f8f9fa;
+            color: #198754;
+        }
     </style>
 </head>
 <body>
+    <!-- Display notification toasts if any -->
+    <?php echo $notificationsHTML; ?>
+    
     <!-- Topbar/Header -->
 <nav class="navbar navbar-expand-lg navbar-dark custom-topbar px-3">
   <div class="container-fluid d-flex justify-content-between align-items-center">
@@ -389,6 +438,35 @@ $latestRequests = $result->fetch_all(MYSQLI_ASSOC);
             main.classList.add('col-12');
         }
     });
+
+    // Initialize auto-hide for toasts after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        var toasts = document.querySelectorAll('.toast');
+        toasts.forEach(function(toast) {
+            setTimeout(function() {
+                var bsToast = new bootstrap.Toast(toast);
+                bsToast.hide();
+            }, 5000);
+        });
+    });
+    
+    // Check for new notifications periodically
+    function checkNotifications() {
+        $.ajax({
+            url: 'check_student_notifications.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                if(data.new_notifications) {
+                    // Refresh the page to show new notifications
+                    location.reload();
+                }
+            }
+        });
+    }
+    
+    // Check every 30 seconds
+    setInterval(checkNotifications, 30000);
 </script>
 
 
