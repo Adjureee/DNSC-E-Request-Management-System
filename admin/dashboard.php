@@ -254,38 +254,81 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                             </button>
                             <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
                                 <div class="notification-header">
-                                    <strong>Notifications</strong>
+                                    <strong>System Activity</strong>
                                     <?php if($notificationCount > 0): ?>
                                         <a href="?mark_read=all" class="text-decoration-none small">Mark all as read</a>
                                     <?php endif; ?>
                                 </div>
                                 
-                                <?php if(empty($adminNotifications)): ?>
-                                    <div class="notification-item">
-                                        <span class="text-muted">No new notifications</span>
-                                    </div>
-                                <?php else: ?>
-                                    <?php foreach($adminNotifications as $notification): ?>
-                                        <div class="notification-item">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <strong>
-                                                    <?php if($notification['request_type'] == 'registration'): ?>
-                                                        <i class="fas fa-user-plus text-primary me-1"></i>
-                                                    <?php elseif($notification['request_type'] == 'student_request'): ?>
-                                                        <i class="fas fa-file-alt text-success me-1"></i>
-                                                    <?php elseif($notification['request_type'] == 'alumni_request'): ?>
-                                                        <i class="fas fa-user-graduate text-info me-1"></i>
-                                                    <?php endif; ?>
-                                                    <?php echo $notification['request_type']; ?>
-                                                </strong>
-                                                <small class="notification-time">
-                                                    <?php echo date('M d, g:i A', strtotime($notification['created_at'])); ?>
-                                                </small>
+                                <div class="p-3">
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                                                <div>
+                                                    <h6 class="mb-0" style="font-size: 0.8rem;">New Requests</h6>
+                                                    <h5 class="mb-0"><?php echo $newRequestsCount; ?></h5>
+                                                </div>
+                                                <div class="bg-success text-white p-2 rounded">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </div>
                                             </div>
-                                            <div><?php echo $notification['message']; ?></div>
                                         </div>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
+                                        <div class="col-6">
+                                            <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                                                <div>
+                                                    <h6 class="mb-0" style="font-size: 0.8rem;">Registrations</h6>
+                                                    <h5 class="mb-0"><?php echo $newRegistrationsCount; ?></h5>
+                                                </div>
+                                                <div class="bg-primary text-white p-2 rounded">
+                                                    <i class="fas fa-user-plus"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <h6 class="mb-2" style="font-size: 0.8rem;">Notification Summary</h6>
+                                        <ul class="list-group list-group-sm">
+                                            <?php foreach($notificationTypes as $type): ?>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+                                                <small><?php echo ucfirst(str_replace('_', ' ', $type['request_type'])); ?></small>
+                                                <span class="badge bg-primary rounded-pill"><?php echo $type['count']; ?></span>
+                                            </li>
+                                            <?php endforeach; ?>
+                                            <?php if(empty($notificationTypes)): ?>
+                                            <li class="list-group-item text-muted py-1"><small>No notifications</small></li>
+                                            <?php endif; ?>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="notification-header">
+                                    <strong>Recent Activity</strong>
+                                </div>
+                                
+                                <div class="p-0">
+                                    <ul class="list-group list-group-flush">
+                                        <?php foreach($adminNotifications as $notification): ?>
+                                        <li class="list-group-item py-2">
+                                            <div class="d-flex justify-content-between">
+                                                <?php if($notification['request_type'] == 'registration'): ?>
+                                                    <span><i class="fas fa-user-plus text-primary me-2"></i> <?php echo $notification['message']; ?></span>
+                                                <?php elseif($notification['request_type'] == 'student_request'): ?>
+                                                    <span><i class="fas fa-file-alt text-success me-2"></i> <?php echo $notification['message']; ?></span>
+                                                <?php elseif($notification['request_type'] == 'alumni_request'): ?>
+                                                    <span><i class="fas fa-user-graduate text-info me-2"></i> <?php echo $notification['message']; ?></span>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div class="mt-1">
+                                                <small class="text-muted"><?php echo date('M d, g:i A', strtotime($notification['created_at'])); ?></small>
+                                            </div>
+                                        </li>
+                                        <?php endforeach; ?>
+                                        <?php if(empty($adminNotifications)): ?>
+                                        <li class="list-group-item text-center py-3 text-muted">No recent activity</li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
                                 
                                 <div class="notification-footer">
                                     <a href="admin_notifications.php" class="text-decoration-none">View all notifications</a>
@@ -354,91 +397,6 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                                 <h3 class="mb-0"><?php echo $completedRequests; ?></h3>
                             </div>
                             <i class="fas fa-check-double fa-3x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trigger Stats Cards -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0">System Activity</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
-                                        <div>
-                                            <h6 class="mb-0">New Requests</h6>
-                                            <h4 class="mb-0"><?php echo $newRequestsCount; ?></h4>
-                                        </div>
-                                        <div class="bg-success text-white p-3 rounded">
-                                            <i class="fas fa-file-alt fa-2x"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
-                                        <div>
-                                            <h6 class="mb-0">New Registrations</h6>
-                                            <h4 class="mb-0"><?php echo $newRegistrationsCount; ?></h4>
-                                        </div>
-                                        <div class="bg-primary text-white p-3 rounded">
-                                            <i class="fas fa-user-plus fa-2x"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-3">
-                                <h6>Notification Summary</h6>
-                                <ul class="list-group">
-                                    <?php foreach($notificationTypes as $type): ?>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <?php echo ucfirst(str_replace('_', ' ', $type['request_type'])); ?>
-                                        <span class="badge bg-primary rounded-pill"><?php echo $type['count']; ?></span>
-                                    </li>
-                                    <?php endforeach; ?>
-                                    <?php if(empty($notificationTypes)): ?>
-                                    <li class="list-group-item text-muted">No notifications</li>
-                                    <?php endif; ?>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <!-- Recent activity log from triggers -->
-                    <div class="card">
-                        <div class="card-header bg-light">
-                            <h5 class="mb-0">Recent Activity</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            <ul class="list-group list-group-flush">
-                                <?php foreach($adminNotifications as $notification): ?>
-                                <li class="list-group-item">
-                                    <div class="d-flex justify-content-between">
-                                        <?php if($notification['request_type'] == 'registration'): ?>
-                                            <span><i class="fas fa-user-plus text-primary me-2"></i> <?php echo $notification['message']; ?></span>
-                                        <?php elseif($notification['request_type'] == 'student_request'): ?>
-                                            <span><i class="fas fa-file-alt text-success me-2"></i> <?php echo $notification['message']; ?></span>
-                                        <?php elseif($notification['request_type'] == 'alumni_request'): ?>
-                                            <span><i class="fas fa-user-graduate text-info me-2"></i> <?php echo $notification['message']; ?></span>
-                                        <?php endif; ?>
-                                        <small class="text-muted"><?php echo date('M d, g:i A', strtotime($notification['created_at'])); ?></small>
-                                    </div>
-                                </li>
-                                <?php endforeach; ?>
-                                <?php if(empty($adminNotifications)): ?>
-                                <li class="list-group-item text-center py-3 text-muted">No recent activity</li>
-                                <?php endif; ?>
-                            </ul>
-                            <div class="card-footer text-center py-2">
-                                <a href="admin_notifications.php" class="text-decoration-none">View all activity</a>
-                            </div>
                         </div>
                     </div>
                 </div>
