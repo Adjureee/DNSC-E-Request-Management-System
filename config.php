@@ -126,4 +126,86 @@ function getStatusBadgeClass($status) {
         default => 'bg-secondary',
     };
 }
+
+// Function to create database views for dashboard statistics
+function createDatabaseViews($conn) {
+    // Student Dashboard View
+    $conn->query("
+        CREATE OR REPLACE VIEW view_student_dashboard AS
+        SELECT 
+            u.id AS user_id,
+            COUNT(r.id) AS total_requests,
+            SUM(CASE WHEN r.status = 'pending' THEN 1 ELSE 0 END) AS pending_requests,
+            SUM(CASE WHEN r.status = 'approved' THEN 1 ELSE 0 END) AS approved_requests,
+            SUM(CASE WHEN r.status = 'completed' THEN 1 ELSE 0 END) AS completed_requests,
+            (SELECT COUNT(*) FROM notifications n WHERE n.user_id = u.id AND n.is_read = 0) AS unread_notifications
+        FROM users u
+        LEFT JOIN requests r ON u.id = r.user_id
+        WHERE u.role = 'student'
+        GROUP BY u.id
+    ");
+    
+    // Alumni Dashboard View
+    $conn->query("
+        CREATE OR REPLACE VIEW view_alumni_dashboard AS
+        SELECT 
+            u.id AS user_id,
+            COUNT(r.id) AS total_requests,
+            SUM(CASE WHEN r.status = 'pending' THEN 1 ELSE 0 END) AS pending_requests,
+            SUM(CASE WHEN r.status = 'approved' THEN 1 ELSE 0 END) AS approved_requests,
+            SUM(CASE WHEN r.status = 'completed' THEN 1 ELSE 0 END) AS completed_requests,
+            (SELECT COUNT(*) FROM notifications n WHERE n.user_id = u.id AND n.is_read = 0) AS unread_notifications
+        FROM users u
+        LEFT JOIN alumni_requests r ON u.id = r.user_id
+        WHERE u.role = 'alumni'
+        GROUP BY u.id
+    ");
+    
+    // Admin Dashboard View
+    $conn->query("
+        CREATE OR REPLACE VIEW view_admin_dashboard AS
+        SELECT 
+            (SELECT COUNT(*) FROM requests) + (SELECT COUNT(*) FROM alumni_requests) AS total_requests,
+            (SELECT COUNT(*) FROM requests WHERE status = 'pending') + 
+            (SELECT COUNT(*) FROM alumni_requests WHERE status = 'pending') AS pending_requests,
+            (SELECT COUNT(*) FROM requests WHERE status = 'approved') + 
+            (SELECT COUNT(*) FROM alumni_requests WHERE status = 'approved') AS approved_requests,
+            (SELECT COUNT(*) FROM requests WHERE status = 'completed') + 
+            (SELECT COUNT(*) FROM alumni_requests WHERE status = 'completed') AS completed_requests,
+            (SELECT COUNT(*) FROM requests WHERE status = 'pending' AND is_seen = 0) + 
+            (SELECT COUNT(*) FROM alumni_requests WHERE status = 'pending' AND is_seen = 0) AS new_requests
+    ");
+    
+    // Recent Requests View for Students
+    $conn->query("
+        CREATE OR REPLACE VIEW view_student_recent_requests AS
+        SELECT 
+            r.id, 
+            r.user_id, 
+            r.request_type, 
+            r.status, 
+            r.tracking_number, 
+            r.created_at
+        FROM requests r
+        ORDER BY r.created_at DESC
+    ");
+    
+    // Recent Requests View for Alumni
+    $conn->query("
+        CREATE OR REPLACE VIEW view_alumni_recent_requests AS
+        SELECT 
+            r.id, 
+            r.user_id, 
+            r.request_type, 
+            r.status, 
+            r.tracking_number, 
+            r.created_at
+        FROM alumni_requests r
+        ORDER BY r.created_at DESC
+    ");
+}
+
+// Call this function during system initialization or update
+// Uncomment the line below when you want to create/update the views
+// createDatabaseViews($conn);
 ?>

@@ -4,18 +4,27 @@ checkAlumniAuth();
 
 $user_id = $_SESSION['user_id'];
 
-// Count requests
-$result = $conn->query("SELECT COUNT(*) as total FROM alumni_requests WHERE user_id = $user_id");
-$totalRequests = $result->fetch_assoc()['total'];
+// Use the view_alumni_dashboard view to get statistics
+$stmt = $conn->prepare("SELECT * FROM view_alumni_dashboard WHERE user_id = ?");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
-$result = $conn->query("SELECT COUNT(*) as pending FROM alumni_requests WHERE user_id = $user_id AND status = 'pending'");
-$pendingRequests = $result->fetch_assoc()['pending'];
-
-$result = $conn->query("SELECT COUNT(*) as approved FROM alumni_requests WHERE user_id = $user_id AND status = 'approved'");
-$approvedRequests = $result->fetch_assoc()['approved'];
-
-$result = $conn->query("SELECT COUNT(*) as completed FROM alumni_requests WHERE user_id = $user_id AND status = 'completed'");
-$completedRequests = $result->fetch_assoc()['completed'];
+if ($result->num_rows > 0) {
+    $stats = $result->fetch_assoc();
+    $totalRequests = $stats['total_requests'];
+    $pendingRequests = $stats['pending_requests'];
+    $approvedRequests = $stats['approved_requests'];
+    $completedRequests = $stats['completed_requests'];
+    $unreadNotifications = $stats['unread_notifications'];
+} else {
+    // Default values if alumni has no records
+    $totalRequests = 0;
+    $pendingRequests = 0;
+    $approvedRequests = 0;
+    $completedRequests = 0;
+    $unreadNotifications = 0;
+}
 
 // Get notif sa triggers
 $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC");
@@ -23,7 +32,8 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-$stmt = $conn->prepare("SELECT * FROM alumni_requests WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
+// Get latest requests using view
+$stmt = $conn->prepare("SELECT * FROM view_alumni_recent_requests WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $latestRequests = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
