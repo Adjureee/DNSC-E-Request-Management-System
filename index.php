@@ -95,8 +95,6 @@ if (isset($_SESSION['user_id'])) {
         .nav-link:hover::after, .nav-link.active::after {
             width: calc(100% - 30px);
         }
-        
-        /* Improved Button Styling */
         .navbar .btn {
             padding: 8px 18px;
             border-radius: 8px;
