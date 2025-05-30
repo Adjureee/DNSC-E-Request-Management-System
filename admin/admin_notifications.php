@@ -68,8 +68,11 @@ $unread_count = $unread_query->fetch_assoc()['unread'];
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
+        }
+         .custom-topbar {
+         background-color: #2d5516;
         }
         .nav-link {
             color: rgba(255,255,255,.8);
@@ -119,14 +122,49 @@ $unread_count = $unread_query->fetch_assoc()['unread'];
     </style>
 </head>
 <body>
-<div class="container-fluid">
+     <!-- Topbar/Header -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-topbar px-3">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+        
+        <!-- Left section: Brand + Toggle -->
+        <div class="d-flex align-items-center">
+            <!-- Sidebar toggle -->
+            <button class="btn btn-outline-light me-2" id="sidebarToggleTop">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Brand -->
+            <a class="navbar-brand mb-0 h1" href="#">DNSC E-Request System</a>
+        </div>
+
+    <!-- Profile dropdown -->
+    <div class="dropdown ms-auto d-none d-lg-block">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>
+     <!-- Profile dropdown for smaller screens (visible when navbar is collapsed) -->
+     <div class="dropdown d-block d-lg-none">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownMobile">
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid" id="layoutRow">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+        <div class="col-md-3 col-lg-2 sidebar collapse" id="sidebarMenu">
             <div class="position-sticky pt-3">
                 <div class="text-center mb-4">
-                    <h5>DNSC E-Request System</h5>
-                    <p class="text-white">Admin Panel</p>
+                    <h5>Admin Panel</h5>
+                    <!-- <p class="text-white">Admin Panel</p> -->
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item"><a class="nav-link" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
@@ -156,26 +194,26 @@ $unread_count = $unread_query->fetch_assoc()['unread'];
                             Announcement List
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link active" href="admin_notifications.php">
                             <i class="fas fa-bell me-2"></i> Notifications
                             <?php if($unread_count > 0): ?>
                                 <span class="notification-badge"><?php echo $unread_count; ?></span>
                             <?php endif; ?>
                         </a>
-                    </li>
-                    <li class="nav-item mt-5">
+                    </li> -->
+                    <!-- <li class="nav-item mt-5">
                         <a class="nav-link" href="../logout.php">
                             <i class="fas fa-sign-out-alt me-2"></i>
                             Logout
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <main class="col-12 px-md-4 py-4" id="mainContent">
             <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Admin Notifications</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
@@ -281,5 +319,22 @@ $unread_count = $unread_query->fetch_assoc()['unread'];
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+ <script>
+    document.getElementById('sidebarToggleTop').addEventListener('click', function () {
+        var sidebar = document.getElementById('sidebarMenu');
+        var main = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('show');
+
+        if (sidebar.classList.contains('show')) {
+            main.classList.remove('col-12');
+            main.classList.add('col-md-9', 'col-lg-10');
+        } else {
+            main.classList.remove('col-md-9', 'col-lg-10');
+            main.classList.add('col-12');
+        }
+    });
+</script>
 </body>
 </html>

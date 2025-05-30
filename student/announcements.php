@@ -62,6 +62,9 @@ $announcements = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             background-color: #2d5516;
             color: white;
         }
+        .custom-topbar {
+         background-color: #2d5516;
+        }
         .nav-link {
             color: rgba(255,255,255,.8);
         }
@@ -111,14 +114,52 @@ $announcements = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     </style>
 </head>
 <body>
-   <div class="container-fluid">
+     <!-- Topbar/Header -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-topbar px-3">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+        
+        <!-- Left section: Brand + Toggle -->
+        <div class="d-flex align-items-center">
+            <!-- Sidebar toggle -->
+            <button class="btn btn-outline-light me-2" id="sidebarToggleTop">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Brand -->
+            <a class="navbar-brand mb-0 h1" href="#">DNSC E-Request System</a>
+        </div>
+
+    <!-- Profile dropdown -->
+    <div class="dropdown ms-auto d-none d-lg-block">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>
+     <!-- Profile dropdown for smaller screens (visible when navbar is collapsed) -->
+     <div class="dropdown d-block d-lg-none">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownMobile">
+            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>
+ </nav>
+
+   <div class="container-fluid" id="layoutRow">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="col-md-3 col-lg-2 sidebar collapse" id="sidebarMenu">
                 <div class="position-sticky pt-3">
                      <div class="text-center mb-4">
-                        <h5>DNSC E-Request System</h5>
-                        <p class="text-light">Student Portal</p>
+                        <h5>Student Portal</h5>
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -155,7 +196,7 @@ $announcements = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     </ul>
                 </div>
     </div>  
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+<main class="col-12 px-md-4 py-4" id="mainContent">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
                     <h1 class="h2">Announcement</h1>
                 </div>
@@ -251,6 +292,23 @@ async function loadAnnouncementDetails(button) {
         console.error(error);
     }
 }
+</script>
+
+<script>
+    document.getElementById('sidebarToggleTop').addEventListener('click', function () {
+        var sidebar = document.getElementById('sidebarMenu');
+        var main = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('show');
+
+        if (sidebar.classList.contains('show')) {
+            main.classList.remove('col-12');
+            main.classList.add('col-md-9', 'col-lg-10');
+        } else {
+            main.classList.remove('col-md-9', 'col-lg-10');
+            main.classList.add('col-12');
+        }
+    });
 </script>
 </body>
 </html>

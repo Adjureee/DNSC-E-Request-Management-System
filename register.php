@@ -68,180 +68,276 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['registerbtn'])) {
     <title>Register - DNSC E-Request</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .register-container { max-width: 600px; margin: 50px auto; }
-        .card { border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .card-header { background-color: #198754; color: white; }
-        .btn-primary { width: 100%; background-color: #198754; }
-        #preview-img {
-            margin-top: 10px;
-            max-width: 120px;
-            max-height: 120px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
+        :root {
+            --primary: #b3cc50;
+            --secondary: #6f9733;
+            --tertiary: #478026;
+            --quaternary: #2c5315;
         }
-        .modal-img {
+        body {
+            background: linear-gradient(to right, #b3cc50, #478026);
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .register-container {
+            max-width: 900px;
+            margin: 10px auto;
+            display: flex;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .left-panel {
+        width: 40%;
+        background-image: url('assets/img/student3.jpg'); /* replace with your image path */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: #fff;
+        padding: 30px;
+        border-radius: 10px 0 0 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        } 
+        .left-panel .panel-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .left-panel .panel-header h4 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .left-panel img {
             max-width: 100%;
             height: auto;
+            margin-bottom: 20px;
+        }
+        /* .left-panel .step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        } */
+        .right-panel {
+            width: 60%;
+            padding: 30px;
+        }
+        .card-header {
+            background-color: #336A29;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            border-radius: 10px 10px 0 0;
+        }
+        .btn-primary {
+            background-color: #336A29;
+            border-color: #336A29;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #283618;
+            border-color: #283618;
+        }
+        .btn-success {
+            background-color: #336A29;
+            border-color: #336A29;
+        }
+        .btn-success:hover {
+            background-color: #283618;
+            border-color: #283618;
+        }
+        a {
+            color: #DDA15E;
+        }
+        a:hover {
+            color: #BC6C25;
+        }
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+        }
+        #preview-img {
+            max-height: 150px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: none;
+            object-fit: cover;
+        }
+        .modal-lg {
+            max-width: 450px;
         }
     </style>
 </head>
 <body>
-
-<div class="container register-container">
-    <div class="card">
-        <div class="card-header text-center">
-            <h4>Create Account</h4>
+    <div class="register-container">
+        <div class="left-panel">
+            <!-- <img src="assets/img/student3.jpg" alt="Step 1 Illustration" /> -->
         </div>
-        <div class="card-body">
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= $error ?></div>
-            <?php elseif ($success): ?>
-                <div class="alert alert-success"><?= $success ?></div>
-            <?php endif; ?>
+        <div class="right-panel">
+            <div class="card">
+                <div class="card-header">
+                    <h4>DNSC E-REQUEST SYSTEM</h4>
+                    <h4>Register</h4>
+                </div>
+                <div class="card-body">
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><?= $error ?></div>
+                    <?php elseif ($success): ?>
+                        <div class="alert alert-success"><?= $success ?></div>
+                    <?php endif; ?>
 
-            <form action="register.php" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label>Fullname</label>
-                    <input type="text" name="full_name" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Student ID</label>
-                    <input type="text" name="stud_id" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Institute</label>
-                    <select name="institute" id="institute" class="form-control" required onchange="updatePrograms()">
-                        <option value="" disabled selected>Select Institute</option>
-                        <option value="IC">Institute of Computing</option>
-                        <option value="IE">Institute of Engineering</option>
-                        <option value="IT">Institute of Teacher Education</option>
-                        <option value="IAS">Institute of Arts and Sciences</option>
-                        <option value="IM">Institute of Management</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Program</label>
-                    <select name="program" id="program" class="form-control" required>
-                        <option value="" disabled selected>Select Program</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" name="confirm_password" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Upload ID Photo</label>
-                    <input type="file" name="photo" class="form-control-file" accept="image/*" onchange="previewPhoto(this)" required>
-                    <img id="preview-img" onclick="openImageModal()" />
-                </div>
-                <div class="form-group">
-                    <label>Status</label>
-                    <select name="pre_selected_role" class="form-control" required>
-                        <option value="" disabled selected>Select Status</option>
-                        <option value="student">Current Student</option>
-                        <option value="alumni">Alumni/Graduate</option>
-                    </select>
-                </div>
-
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal">
-                    Confirm
-                </button>
-
-                <!-- Confirmation Modal -->
-                <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Confirm Submission</h5>
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <form action="register.php" method="POST" enctype="multipart/form-data">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Fullname</label>
+                                <input type="text" name="full_name" class="form-control" required>
                             </div>
-                            <div class="modal-body">
-                                Are you sure you want to submit this registration form?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" name="registerbtn" class="btn btn-success">Yes, Submit</button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Cancel</button>
+                            <div class="form-group col-md-6">
+                                <label>Email</label>
+                                <input type="email" name="email" class="form-control" required>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Photo Preview Modal -->
-                <div class="modal fade" id="photoModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Photo Preview</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                  <span aria-hidden="true">&times;</span>
-                                </button>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Student ID</label>
+                                <input type="text" name="stud_id" class="form-control" required>
                             </div>
-                                <div class="modal-body text-center">
-                                <img id="modal-photo" class="modal-img" />
+                            <div class="form-group col-md-6">
+                            <label>Status</label>
+                            <select name="pre_selected_role" class="form-control" required>
+                                <option value="" disabled selected>Select Status</option>
+                                <option value="student">Current Student</option>
+                                <option value="alumni">Alumni/Graduate</option>
+                            </select>
+                        </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Institute</label>
+                                <select name="institute" id="institute" class="form-control" required onchange="updatePrograms()">
+                                    <option value="" disabled selected>Select Institute</option>
+                                    <option value="IC">Institute of Computing</option>
+                                    <option value="IAAS">Institute of Aquatic and Applied Sciences</option>
+                                    <option value="ILEGG">Institute of Leadership, Entrepreneurship and Good Governance</option>
+                                    <option value="ITED">Institute of Teacher Education</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Program</label>
+                                <select name="program" id="program" class="form-control" required>
+                                    <option value="" disabled selected>Select Program</option>
+                                </select>
                             </div>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>Password</label>
+                                <input type="password" name="password" class="form-control" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Confirm Password</label>
+                                <input type="password" name="confirm_password" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+             <label>Upload ID Photo</label>
+                            <input type="file" name="photo" class="form-control-file" accept="image/*" onchange="previewPhoto(this)" required>
+                            <img id="preview-img" onclick="openImageModal()" />
+                        </div>
+                        <div class="btn-group">
+                            <!-- <button type="reset" class="btn btn-outline-secondary">Cancel</button> -->
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmModal">
+                                Register
+                            </button>
+                        </div>
+
+                        <!-- Confirmation Modal -->
+                        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Confirm Submission</h5>
+                                        <button type="button" class="close" data-dismiss="modal">×</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to submit this registration form?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" name="registerbtn" class="btn btn-success">Yes, Submit</button>
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Photo Preview Modal -->
+                        <div class="modal fade" id="photoModal" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Photo Preview</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img id="modal-photo" class="modal-img" style="max-width: 300px; max-height: 300px; object-fit: cover;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="login.php">Already have an account? Login here</a>
                     </div>
                 </div>
-
-            </form>
-            <div class="text-center mt-3">
-                <a href="login.php">Already have an account? Login here</a>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-function updatePrograms() {
-    const institute = document.getElementById('institute').value;
-    const programSelect = document.getElementById('program');
-    const programs = {
-        IC: ['BSIT', 'BSCS'],
-        IE: ['BSCE', 'BSEE'],
-        IT: ['BSEd Math', 'BSEd English'],
-        IAS: ['AB English', 'BS Biology'],
-        IM: ['BSBA', 'BS Accountancy']
-    };
-    programSelect.innerHTML = '<option value="" disabled selected>Select Program</option>';
-    if (programs[institute]) {
-        programs[institute].forEach(p => {
-            const option = document.createElement('option');
-            option.value = p;
-            option.text = p;
-            programSelect.appendChild(option);
-        });
-    }
-}
-
-function previewPhoto(input) {
-    const file = input.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById('preview-img').src = e.target.result;
-            document.getElementById('modal-photo').src = e.target.result;
+    <script>
+    function updatePrograms() {
+        const institute = document.getElementById('institute').value;
+        const programSelect = document.getElementById('program');
+        const programs = {
+            IC: ['BSIT', 'BSIS'],
+            IAAS: ['BSAF', 'BSFAS', 'BSFT', 'BSMB'],
+            ILEGG: ['BPA', 'BSDRM', 'BS ENTREP', 'BSSW', 'BSTM'],
+            ITED: ['BACOMM', 'BSED', 'BTLED', 'BPE'],
+        };
+        programSelect.innerHTML = '<option value="" disabled selected>Select Program</option>';
+        if (programs[institute]) {
+            programs[institute].forEach(p => {
+                const option = document.createElement('option');
+                option.value = p;
+                option.text = p;
+                programSelect.appendChild(option);
+            });
         }
-        reader.readAsDataURL(file);
     }
-}
 
-function openImageModal() {
-    $('#photoModal').modal('show');
-}
-</script>
+    function previewPhoto(input) {
+        const file = input.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('modal-photo').src = e.target.result;
+                document.getElementById('preview-img').style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    function openImageModal() {
+        $('#photoModal').modal('show');
+    }
+    </script>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

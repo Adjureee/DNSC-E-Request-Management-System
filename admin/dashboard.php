@@ -81,8 +81,11 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
+        }
+        .custom-topbar {
+         background-color: #2d5516;
         }
         .nav-link {
             color: rgba(255,255,255,.8);
@@ -100,21 +103,21 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #498428;
+            border-color: #498428;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-outline-secondary {
-            color: #198754;
-            border-color: #198754;
+            color: #498428;
+            border-color: #498428;
         }
         .btn-outline-secondary:hover {
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
-            border-color: #198754;
+            border-color: #2d5516;
         }
         .badge-notification {
             position: absolute;
@@ -173,14 +176,151 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
     </style>
 </head>
 <body>
-<div class="container-fluid">
+       <!-- Topbar/Header -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-topbar px-3">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+        
+        <!-- Left section: Brand + Toggle -->
+        <div class="d-flex align-items-center">
+            <!-- Sidebar toggle -->
+            <button class="btn btn-outline-light me-2" id="sidebarToggleTop">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Brand -->
+            <a class="navbar-brand mb-0 h1" href="#">DNSC E-Request System</a>
+        </div>
+
+         <!-- Notification Dropdown (center/right section) -->
+    <div class="d-flex align-items-center ms-auto gap-2 d-none d-lg-flex">
+      <!-- <div class="btn-group"> -->
+        <div class="dropdown">
+          <button class="btn btn-outline-light dropdown-toggle  btn-sm px-3"style="min-width: 150px; height: 38px;" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-bell me-1"></i> Notifications
+            <?php if($notificationCount > 0): ?>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                <?php echo $notificationCount; ?>
+              </span>
+            <?php endif; ?>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown">
+            <div class="notification-header">
+              <strong>System Activity</strong>
+              <?php if($notificationCount > 0): ?>
+                <a href="?mark_read=all" class="text-decoration-none small">Mark all as read</a>
+              <?php endif; ?>
+            </div>
+
+            <div class="p-3">
+              <div class="row mb-3">
+                <div class="col-6">
+                  <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                    <div>
+                      <h6 class="mb-0" style="font-size: 0.8rem;">New Requests</h6>
+                      <h5 class="mb-0"><?php echo $newRequestsCount; ?></h5>
+                    </div>
+                    <div class="bg-success text-white p-2 rounded">
+                      <i class="fas fa-file-alt"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-flex justify-content-between align-items-center p-2 bg-light rounded">
+                    <div>
+                      <h6 class="mb-0" style="font-size: 0.8rem;">Registrations</h6>
+                      <h5 class="mb-0"><?php echo $newRegistrationsCount; ?></h5>
+                    </div>
+                    <div class="bg-primary text-white p-2 rounded">
+                      <i class="fas fa-user-plus"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <h6 class="mb-2" style="font-size: 0.8rem;">Notification Summary</h6>
+                <ul class="list-group list-group-sm">
+                  <?php foreach($notificationTypes as $type): ?>
+                    <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+                      <small><?php echo ucfirst(str_replace('_', ' ', $type['request_type'])); ?></small>
+                      <span class="badge bg-primary rounded-pill"><?php echo $type['count']; ?></span>
+                    </li>
+                  <?php endforeach; ?>
+                  <?php if(empty($notificationTypes)): ?>
+                    <li class="list-group-item text-muted py-1"><small>No notifications</small></li>
+                  <?php endif; ?>
+                </ul>
+              </div>
+            </div>
+
+            <div class="notification-header">
+              <strong>Recent Activity</strong>
+            </div>
+
+            <div class="p-0">
+              <ul class="list-group list-group-flush">
+                <?php foreach($adminNotifications as $notification): ?>
+                  <li class="list-group-item py-2">
+                    <div class="d-flex justify-content-between">
+                      <?php if($notification['request_type'] == 'registration'): ?>
+                        <span><i class="fas fa-user-plus text-primary me-2"></i> <?php echo $notification['message']; ?></span>
+                      <?php elseif($notification['request_type'] == 'student_request'): ?>
+                        <span><i class="fas fa-file-alt text-success me-2"></i> <?php echo $notification['message']; ?></span>
+                      <?php elseif($notification['request_type'] == 'alumni_request'): ?>
+                        <span><i class="fas fa-user-graduate text-info me-2"></i> <?php echo $notification['message']; ?></span>
+                      <?php endif; ?>
+                    </div>
+                    <div class="mt-1">
+                      <small class="text-muted"><?php echo date('M d, g:i A', strtotime($notification['created_at'])); ?></small>
+                    </div>
+                  </li>
+                <?php endforeach; ?>
+                <?php if(empty($adminNotifications)): ?>
+                  <li class="list-group-item text-center py-3 text-muted">No recent activity</li>
+                <?php endif; ?>
+              </ul>
+            </div>
+
+            <div class="notification-footer">
+              <a href="admin_notifications.php" class="text-decoration-none">View all notifications</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile dropdown -->
+    <div class="dropdown">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm px-3" style="min-width: 180px; height: 38px;" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <!-- <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+            <li><hr class="dropdown-divider"></li> -->
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>
+     <!-- Profile dropdown for smaller screens (visible when navbar is collapsed) -->
+     <div class="dropdown d-block d-lg-none">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownMobile">
+            <!-- <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+            <li><hr class="dropdown-divider"></li> -->
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>    
+</nav>
+
+<div class="container-fluid" id="layoutRow">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 d-md-block sidebar">
+        <div class="col-md-3 col-lg-2 sidebar collapse" id="sidebarMenu">
             <div class="position-sticky pt-3">
                 <div class="text-center mb-4">
-                    <h5>DNSC E-Request System</h5>
-                    <p class="text-muted">Admin Panel</p>
+                    <h5>Admin Panel</h5>
+                    <!-- <p class="text-muted">Admin Panel</p> -->
                 </div>
                 <ul class="nav flex-column">
                     <li class="nav-item">
@@ -233,7 +373,7 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                             Announcement List
                         </a>
                     </li>
-                     <li class="nav-item">
+                     <!-- <li class="nav-item">
                         <a class="nav-link" href="admin_notifications.php">
                             <i class="fas fa-bell me-2"></i> Notifications
                             <?php
@@ -244,21 +384,21 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                                 <span class="badge bg-danger rounded-pill position-absolute top-50 end-0 translate-middle-y me-3"><?php echo $notifCount; ?></span>
                             <?php endif; ?>
                         </a>
-                    </li>
-                    <li class="nav-item mt-5">
+                    </li> -->
+                    <!-- <li class="nav-item mt-5">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
                             <i class="fas fa-sign-out-alt me-2"></i> Logout
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <main class="col-12 px-md-4 py-4" id="mainContent">
             <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2">Admin Dashboard</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
+                <!-- <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
                         <div class="dropdown me-3">
                             <button class="btn btn-outline-secondary dropdown-toggle position-relative" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -353,15 +493,15 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                             </div>
                         </div>
                         
-                        <span class="btn btn-sm btn-outline-secondary">Welcome, <?php echo $_SESSION['full_name']; ?></span>
+                         <span class="btn btn-sm btn-outline-secondary">Welcome, <?php echo $_SESSION['full_name']; ?></span>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <!-- Stats Cards -->
             <div class="row my-4">
                 <div class="col-md-3 mb-4">
-                    <div class="card dashboard-card bg-success text-white">
+                    <div class="card dashboard-card" style="background-color: #2d5516; color: white;">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="card-title">Total Requests</h5>
@@ -378,7 +518,7 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                 </div>
                 
                 <div class="col-md-3 mb-4">
-                    <div class="card dashboard-card" style="background-color: #20c997; color: white;">
+                    <div class="card dashboard-card" style="background-color: #498428; color: white;">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="card-title">Pending</h5>
@@ -395,7 +535,7 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                 </div>
                 
                 <div class="col-md-3 mb-4">
-                    <div class="card dashboard-card" style="background-color: #2dd4bf; color: white;">
+                    <div class="card dashboard-card" style="background-color: #749E35; color: white;">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="card-title">Approved</h5>
@@ -407,7 +547,7 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                 </div>
                 
                 <div class="col-md-3 mb-4">
-                    <div class="card dashboard-card" style="background-color: #15803d; color: white;">
+                    <div class="card dashboard-card" style="background-color: #B3CC50; color: white;">
                         <div class="card-body d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="card-title">Completed</h5>
@@ -515,6 +655,22 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                 }
             });
         }, 30000);
+    });
+    </script>
+     <script>
+    document.getElementById('sidebarToggleTop').addEventListener('click', function () {
+        var sidebar = document.getElementById('sidebarMenu');
+        var main = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('show');
+
+        if (sidebar.classList.contains('show')) {
+            main.classList.remove('col-12');
+            main.classList.add('col-md-9', 'col-lg-10');
+        } else {
+            main.classList.remove('col-md-9', 'col-lg-10');
+            main.classList.add('col-12');
+        }
     });
 </script>
 </body>

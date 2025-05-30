@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         .sidebar {
             min-height: 100vh;
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
         }
         .nav-link { color: rgba(255,255,255,.8); }
@@ -201,12 +201,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php endif; ?>
                         </a>
                     </li>
-                    <li class="nav-item mt-5">
+                    <!-- <li class="nav-item mt-5">
                         <a class="nav-link" href="../logout.php">
                             <i class="fas fa-sign-out-alt me-2"></i>
                             Logout
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
