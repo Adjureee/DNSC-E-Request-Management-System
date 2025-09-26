@@ -485,7 +485,7 @@ if(isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Kamo ba jud arjean n chan?</p>
+                <p>Are you sure you want to logout?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
