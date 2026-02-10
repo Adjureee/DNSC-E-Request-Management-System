@@ -52,12 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
             background-color: #f8f9fa;
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #498428;
+            border-color: #498428;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-danger {
             background-color: #dc3545;
@@ -68,14 +68,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
             border-color: #b02a37;
         }
         .modal-header {
-            background-color: #198754;
+            background-color: #2d5516;
             color: white;
         }
         .modal-body p {
             margin-bottom: 10px;
             padding: 8px;
             background-color: #f1fdf6;
-            border-left: 5px solid #198754;
+            border-left: 5px solid #2d5516;
         }
     </style>
 </head>
@@ -93,12 +93,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
                             <label class="form-label">Request Type</label>
                             <select class="form-select" name="request_type" required>
                                 <option value="">Select Request Type</option>
-                                <option>Certificate of Enrollment</option>
-                                <option>Certificate of Grades</option>
-                                <option>Transcript of Records</option>
-                                <option>Certificate of Good Moral Character</option>
-                                <option>Diploma Request</option>
-                                <option>Authentication of Documents</option>
+                               <option>Transcript of Records (Official)</option>
+                                    <option>Diploma Request</option>
+                                    <option>Request for Honorable Dismissal</option>
+                                    <option>Request for CAV (Certification, Authentication, Verification)</option>
+                                    <option>Authentication of Documents</option>
+                                    <option>Certified True Copy of TOR / Diploma</option>
+                                    <option>Request with SPA (Special Power of Attorney)</option>
+                                    <option>Certificate of Graduation / Completion</option>
                                 <option>Other</option>
                             </select>
                         </div>

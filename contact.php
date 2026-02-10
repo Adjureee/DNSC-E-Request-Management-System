@@ -298,7 +298,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <!-- Contact Info -->
     <div class="col-md-5 mb-4">
       <h2 class="fw-bold">Contact Us</h2>
-      <p>Lorem ipsum dolor sit amet consectetur adip</p>
+      <p>For urgent concerns, please reach out via the contact number or email above. Otherwise, leave your message here and we will respond shortly.</p>
 <ul class="list-unstyled contact-info">
   <li>
     <i class="fas fa-phone"></i> 

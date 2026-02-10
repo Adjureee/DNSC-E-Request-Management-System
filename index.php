@@ -255,12 +255,13 @@ if (isset($_SESSION['user_id'])) {
         .team-card:hover .rounded-circle {
             transform: scale(1.05);
             border-color: #e8f5e9;
-        }
-        
-        /* How It Works Section */
+       }
+
+
+         /* How It Works Section */
         .step-item {
             position: relative;
-            padding-bottom: 1.5rem;
+            padding-bottom: 1.5rem ;
         }
         
         .step-item:not(:last-child)::after {
@@ -274,15 +275,17 @@ if (isset($_SESSION['user_id'])) {
         }
         
         .step-circle {
-            background-color: #388e3c;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #2e7d32; /* green */
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(56, 142, 60, 0.3);
+            font-size: 18px;
+            flex-shrink: 0;
         }
+
         
         /* Button Styling */
         .btn-success {
@@ -474,23 +477,21 @@ if (isset($_SESSION['user_id'])) {
                         <!-- Carousel items -->
                         <div class="carousel-inner rounded-lg shadow-lg">
                             <div class="carousel-item active">
-                                <img src="assets/img/DNSC_thumbnail.png" class="d-block w-100" alt="E-Request System">
+                                <img src="assets/img/vision.png" class="d-block w-100" alt="E-Request System">
                                 <div class="carousel-caption d-none d-md-block">
                                 </div>
                             </div>
                             <div class="carousel-item">
-                                <img src="assets/img/campus.jpg" class="d-block w-100" alt="DNSC Campus">
-                                <div class="carousel-caption d-none d-md-block">
-                                    <h5>DNSC Campus</h5>
-                                    <p>Nurturing excellence in education</p>
-                                </div>
+                                <img src="assets/img/mission.png" class="d-block w-100" alt="DNSC Campus">
+                                <!-- <div class="carousel-caption d-none d-md-block">
+                                </div> -->
                             </div>
                             <div class="carousel-item">
-                                <img src="assets/img/students.jpg" class="d-block w-100" alt="DNSC Students">
-                                <div class="carousel-caption d-none d-md-block">
+                                <img src="assets/img/corevalues.png" class="d-block w-100" alt="DNSC Students">
+                                <!-- <div class="carousel-caption d-none d-md-block">
                                     <h5>Our Students</h5>
                                     <p>The future of tomorrow</p>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         
@@ -773,9 +774,9 @@ if (isset($_SESSION['user_id'])) {
                 <div class="col-md-6 text-center text-md-start">
                     <p class="mb-0">&copy; <?php echo date('Y'); ?> DNSC E-Request Management System. All rights reserved.</p>
                 </div>
-                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
-                    <p class="mb-0">Designed by Chanchan <i class="fas fa-heart text-danger"></i> Arjean</p>
-                </div>
+                <!-- <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <p class="mb-0">Designed by BSIT STUDENTS</p>
+                </div> -->
             </div>
         </div>
     </footer>

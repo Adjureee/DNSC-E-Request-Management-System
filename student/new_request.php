@@ -52,12 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
             background-color: #f8f9fa;
         }
         .btn-primary {
-            background-color: #198754;
-            border-color: #198754;
+            background-color: #498428;
+            border-color: #498428;
         }
         .btn-primary:hover {
-            background-color: #146c43;
-            border-color: #146c43;
+            background-color: #2d5516;
+            border-color: #2d5516;
         }
         .btn-danger {
             background-color: #dc3545;
@@ -92,13 +92,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['confirm_submit'])) {
                         <div class="mb-3">
                             <label class="form-label">Request Type</label>
                             <select class="form-select" name="request_type" required>
-                                <option value="">Select Request Type</option>
-                                <option>Certificate of Enrollment</option>
-                                <option>Certificate of Grades</option>
-                                <option>Transcript of Records</option>
-                                <option>Certificate of Good Moral Character</option>
-                                <option>Diploma Request</option>
-                                <option>Authentication of Documents</option>
+                                <option value="">Select Request Type</option>  
+                                    <option>Certificate of Enrollment</option>
+                                    <option>Certificate of Grades</option>
+                                    <option>Certificate of Good Moral Character</option>
+                                    <option>Application for Drop with Permission</option>
+                                    <option>Add / Drop / Change Schedule</option>
+                                    <option>Application for Cross Enrolment / Summer Permit</option>
+                                    <option>INC Completion Form</option>
+                                    <option>Shift of Course / Major</option>
+                                    <option>Withdrawal / Cancellation of Enrollment</option>
+                                    <option>Self-Certification (College)</option>
+                                    <option>Self-Certification (Graduate Studies)</option>
                                 <option>Other</option>
                             </select>
                         </div>

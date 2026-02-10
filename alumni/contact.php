@@ -24,14 +24,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $feedbackType = "error";
     } else {
         // Use the universal contact message stored procedure
-       $result = callProcedure($conn, 'sp_SaveContactMessage', 'issssss', [
-    $user_id,
+       $result = callProcedure($conn, 'sp_SaveContactMessage', 'sssss', [
     $name,
     $email,
     $phone,
     $subject,
-    $message,
-    'alumni'
+    $message
 ]);
 
 
@@ -64,6 +62,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             min-height: 100vh;
             background-color: #2d5516;
             color: white;
+        }
+        .custom-topbar {
+         background-color: #2d5516;
         }
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.85);
@@ -142,14 +143,53 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </style>
 </head>
 <body>
-<div class="container-fluid">
+    <!-- Topbar/Header -->
+<nav class="navbar navbar-expand-lg navbar-dark custom-topbar px-3">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+        
+        <!-- Left section: Brand + Toggle -->
+        <div class="d-flex align-items-center">
+            <!-- Sidebar toggle -->
+            <button class="btn btn-outline-light me-2" id="sidebarToggleTop">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Brand -->
+            <a class="navbar-brand mb-0 h1" href="#">DNSC E-Request System</a>
+        </div>
+
+    <!-- Profile dropdown -->
+    <div class="dropdown ms-auto d-none d-lg-block">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>
+     <!-- Profile dropdown for smaller screens (visible when navbar is collapsed) -->
+     <div class="dropdown d-block d-lg-none">
+        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdownMobile" data-bs-toggle="dropdown" aria-expanded="false">
+            Welcome, <?php echo $_SESSION['full_name']; ?>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownMobile">
+            <li><a class="dropdown-item" href="profile.php">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="../logout.php">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid" id="layoutRow">
     <div class="row">
         <!-- Sidebar -->
-         <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+         <div class="col-md-3 col-lg-2 sidebar collapse" id="sidebarMenu">
                 <div class="position-sticky pt-3">
                     <div class="text-center mb-4">
-                        <h5>DNSC E-Request System</h5>
-                        <p class="text-light">Alumni Portal</p>
+                        <h5>Alumni Portal</h5>
+                     
                     </div>
                     <ul class="nav flex-column">
                         <li class="nav-item">
@@ -193,7 +233,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-5 py-4">
+        <main class="col-12 px-md-4 py-4" id="mainContent">
             <h2 class="page-title mb-4">Contact Admin</h2>
 
             <div class="row g-4">
@@ -269,6 +309,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+     document.getElementById('sidebarToggleTop').addEventListener('click', function () {
+        var sidebar = document.getElementById('sidebarMenu');
+        var main = document.getElementById('mainContent');
+
+        sidebar.classList.toggle('show');
+
+        if (sidebar.classList.contains('show')) {
+            main.classList.remove('col-12');
+            main.classList.add('col-md-9', 'col-lg-10');
+        } else {
+            main.classList.remove('col-md-9', 'col-lg-10');
+            main.classList.add('col-12');
+        }
+    });
+</script>
 
 <?php if (!empty($feedbackMessage)): ?>
 <script>
